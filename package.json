@@ -1,0 +1,29 @@
+{
+  "name": "skeemas",
+  "version": "0.0.0",
+  "description": "JSON Schema validation and express middleware",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha -c --reporter dot *.test.js",
+    "lint": "./node_modules/.bin/jshint ."
+  },
+  "keywords": [
+    "json-schema",
+    "json",
+    "schema",
+    "validation",
+    "validate",
+    "middleware"
+  ],
+  "author": "Matt Dunlap <matt.dunlap@welltok.com>",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.9.3",
+    "jsonschema": "^1.0.0"
+  },
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "jshint": "^2.5.10",
+    "mocha": "^2.0.1"
+  }
+}

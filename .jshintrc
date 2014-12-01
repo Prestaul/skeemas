@@ -1,0 +1,14 @@
+{
+	"node": true,
+	"undef": true,
+	"eqeqeq": true,
+	"eqnull": false,
+	"newcap": true,
+	"nomen": true,
+	"trailing": true,
+
+	"predef": [
+		"describe",
+		"it"
+	]
+}

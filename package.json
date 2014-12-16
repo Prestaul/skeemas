@@ -1,6 +1,6 @@
 {
   "name": "skeemas",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "JSON Schema validation and express middleware",
   "main": "index.js",
   "scripts": {

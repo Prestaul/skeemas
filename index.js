@@ -35,7 +35,12 @@ module.exports = function() {
 
 			if(result.valid) return next();
 
-			res.jsend.fail({ validation:result.errors });
+			res.status(422).json({
+				status: 'fail',
+				data: {
+					validation: result.errors
+				}
+			});
 		}];
 	}
 

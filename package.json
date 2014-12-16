@@ -15,8 +15,12 @@
     "validate",
     "middleware"
   ],
-  "author": "Matt Dunlap <matt.dunlap@welltok.com>",
-  "license": "ISC",
+  "author": "Matt Dunlap <mpdunlap@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Prestaul/skeemas.git"
+  },
   "dependencies": {
     "body-parser": "^1.9.3",
     "jsonschema": "^1.0.0"

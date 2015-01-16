@@ -1,0 +1,22 @@
+{
+  "name": "skeemas-validate",
+  "version": "1.0.0",
+  "description": "Lightweight JSON Schema valiation",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --require tests/bootstrap.js tests/{**/,}/*.test.js"
+  },
+  "keywords": [
+    "json-schema",
+    "validate",
+    "validation",
+    "json",
+    "schema"
+  ],
+  "author": "Matt Dunlap <mpdunlap@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "mocha": "^2.1.0"
+  }
+}

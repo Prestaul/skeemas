@@ -136,14 +136,19 @@ function getType(subject) {
 }
 
 function $ref(subject, schema, result, context) {
-	var refSchema = context.refs.get(schema.$ref, context.schema),
-		refContext = schema.$ref[0] === '#' ? context : {
-			schema: refSchema,
+	var absolute = /^#|\//.test(schema.$ref),
+		ref = absolute ? schema.$ref : context.id.join('') + schema.$ref,
+		refSchema = context.refs.get(ref, context.schema);
+	if(schema.$ref[0] !== '#') {
+		context = {
+			id: [],
+			schema: context.refs.get(ref, context.schema, true),
 			path: context.path.slice(),
 			refs: context.refs
 		};
+	}
 
-	return validateBase(subject, refSchema, result, refContext);
+	return validateBase(subject, refSchema, result, context);
 }
 
 
@@ -151,6 +156,10 @@ function $ref(subject, schema, result, context) {
 function validateBase(subject, schema, result, context) {
 	if(schema.$ref) {
 		return $ref(subject, schema, result, context);
+	}
+
+	if(schema.id) {
+		context.id.push(schema.id);
 	}
 
 	var valid = true,
@@ -163,6 +172,10 @@ function validateBase(subject, schema, result, context) {
 	if(schema.anyOf) valid = valid && anyOf(subject, schema.anyOf, result, context);
 	if(schema.oneOf) valid = valid && oneOf(subject, schema.oneOf, result, context);
 	if(schema.not) valid = valid && not(subject, schema.not, result, context);
+
+	if(schema.id) {
+		context.id.pop();
+	}
 
 	return valid;
 }

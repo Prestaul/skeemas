@@ -9,6 +9,7 @@ module.exports = function() {
 		validate: function(subject, schema) {
 			var result = validationResult();
 			validators.base(subject, schema, result, {
+				id: [],
 				schema: schema,
 				path: ['subject'],
 				refs: refs
@@ -21,6 +22,7 @@ module.exports = function() {
 module.exports.validate = function(subject, schema) {
 	var result = validationResult();
 	validators.base(subject, schema, result, {
+		id: [],
 		schema: schema,
 		path: ['subject'],
 		refs: jsonRefs()

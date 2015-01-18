@@ -69,7 +69,7 @@ npm test
     - [X] object
         - [X] properties
         - [X] patternProperties
-        - [ ] additionalProperties
+        - [X] additionalProperties
         - [X] required
         - [ ] dependencies
         - [ ] minProperties

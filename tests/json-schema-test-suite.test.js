@@ -3,12 +3,13 @@ var glob = require('glob');
 /**
  * Load up the tests from the JSON Schema Test Suite (https://github.com/json-schema/JSON-Schema-Test-Suite)
  */
-describe('JSON Schema Test Suite -', function() {
+describe.only('JSON Schema Test Suite -', function() {
 	function addTests(description, files) {
 		describe(description, function() {
 			files.forEach(function(file) {
-				if(!/\/(additionalItems|default|disallow|divisibleBy|enum|format|items|maximum|maxItems|maxLength|minimum|minItems|minLength|pattern|patternProperties|ref|required|type|uniqueItems)\.json/.test(file)) return;
-				// if(!/\/(ref)\.json/.test(file)) return;
+				// if(!/\/(additionalItems|additionalProperties|default|disallow|divisibleBy|enum|format|items|maximum|maxItems|maxLength|minimum|minItems|minLength|pattern|patternProperties|ref|required|type|uniqueItems)\.json/.test(file)) return;
+				if(/\/(dependencies|extends|zeroTerminatedFloats)\.json/.test(file)) return;
+				// if(!/\/(refRemote)\.json/.test(file)) return;
 
 				// Load the suite
 				require(file).forEach(function(suite) {

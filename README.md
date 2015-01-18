@@ -50,11 +50,12 @@ npm test
         - [ ] enum
         - [ ] required
         - [ ] disallow
+        - [ ] extends
     - [X] array
         - [ ] items
         - [ ] additionalItems
-        - [ ] minItems
-        - [ ] maxItems
+        - [X] minItems
+        - [X] maxItems
         - [ ] uniqueItems
     - [X] boolean
     - [X] null
@@ -70,6 +71,7 @@ npm test
         - [ ] patternProperties
         - [ ] additionalProperties
         - [ ] required
+        - [ ] dependencies
         - [ ] minProperties
         - [ ] maxProperties
         - dependencies

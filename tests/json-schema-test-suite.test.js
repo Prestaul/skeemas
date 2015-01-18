@@ -7,7 +7,7 @@ describe('JSON Schema Test Suite -', function() {
 	function addTests(description, files) {
 		describe(description, function() {
 			files.forEach(function(file) {
-				if(!/\/(minLength|maxLength|pattern|format|minimum|maximum|divisibleBy)\.json/.test(file)) return;
+				if(!/\/(minLength|maxLength|pattern|format|minItems|maxItems|minimum|maximum|divisibleBy)\.json/.test(file)) return;
 
 				// Load the suite
 				require(file).forEach(function(suite) {

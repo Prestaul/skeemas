@@ -39,8 +39,8 @@ npm test
     - description
     - default
 - References
-    - definitions
-    - $ref
+    - [ ] definitions
+    - [X] $ref
 - Criteria
     - any type
         - [ ] allOf

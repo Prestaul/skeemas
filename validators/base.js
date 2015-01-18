@@ -1,6 +1,5 @@
 var validators = require('./'),
-	validationResult = require('../validation-result'),
-	refs = require('skeemas-json-refs')();
+	validationResult = require('../validation-result');
 
 
 function allOf(subject, schemas, result, context) {
@@ -137,10 +136,11 @@ function getType(subject) {
 }
 
 function $ref(subject, schema, result, context) {
-	var refSchema = refs.get(schema.$ref, subject),
-		refContext = {
+	var refSchema = context.refs.get(schema.$ref, context.schema),
+		refContext = schema.$ref[0] === '#' ? context : {
 			schema: refSchema,
-			path: context.path.slice()
+			path: context.path.slice(),
+			refs: context.refs
 		};
 
 	return validateBase(subject, refSchema, result, refContext);

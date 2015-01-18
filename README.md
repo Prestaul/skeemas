@@ -43,14 +43,14 @@ npm test
     - [X] $ref
 - Criteria
     - any type
-        - [ ] allOf
-        - [ ] anyOf
-        - [ ] oneOf
-        - [ ] not
+        - [X] allOf
+        - [X] anyOf
+        - [X] oneOf
+        - [X] not
         - [X] enum
         - [X] required
         - [X] disallow
-        - [ ] extends
+        - [X] extends
     - [X] array
         - [X] items
         - [X] additionalItems
@@ -71,9 +71,9 @@ npm test
         - [X] patternProperties
         - [X] additionalProperties
         - [X] required
-        - [ ] dependencies
-        - [ ] minProperties
-        - [ ] maxProperties
+        - [X] dependencies
+        - [X] minProperties
+        - [X] maxProperties
         - dependencies
     - [X] string
         - [X] minLength

@@ -99,7 +99,7 @@ function maxProperties(subject, schema, result, context) {
 
 function required(subject, requiredProps, result, context) {
 	if(!Array.isArray(requiredProps))
-		throw new Error();
+		throw new Error('Invalid schema: "required" must be an array');
 
 	var valid = true,
 		i = requiredProps.length;
@@ -107,6 +107,40 @@ function required(subject, requiredProps, result, context) {
 		if(!(requiredProps[i] in subject)) {
 			result.addError('Missing required property "' + requiredProps[i] + '"', subject, requiredProps[i], context);
 			valid = false;
+		}
+	}
+
+	return valid;
+}
+
+function dependencies(subject, deps, result, context) {
+	if(typeof deps !== 'object')
+		throw new Error('Invalid schema: "dependencies" must be an object');
+
+	var valid = true,
+		keys = Object.keys(deps),
+		i = keys.length,
+		requiredProps, j;
+
+	while(i--) {
+		if(!(keys[i] in subject)) continue;
+
+		requiredProps = deps[keys[i]];
+
+		if(typeof requiredProps === 'string') requiredProps = [ requiredProps ];
+
+		if(Array.isArray(requiredProps)) {
+			j = requiredProps.length;
+			while(j--) {
+				if(!(requiredProps[j] in subject)) {
+					result.addError('Missing required property "' + requiredProps[j] + '"', subject, requiredProps[j], context);
+					valid = false;
+				}
+			}
+		} else if(typeof requiredProps === 'object') {
+			valid = validateBase(subject, requiredProps, result, context) && valid;
+		} else {
+			throw new Error('Invalid schema: dependencies must be string, array, or object');
 		}
 	}
 
@@ -130,6 +164,7 @@ function validateObject(subject, schema, result, context) {
 	if('minProperties' in schema) valid = minProperties(subject, schema, result, context) && valid;
 	if('maxProperties' in schema) valid = maxProperties(subject, schema, result, context) && valid;
 	if(schema.required) valid = required(subject, schema.required, result, context) && valid;
+	if(schema.dependencies) valid = dependencies(subject, schema.dependencies, result, context) && valid;
 
 	return valid;
 }

@@ -79,6 +79,24 @@ function additionalProperties(handledKeys, subject, schema, result, context) {
 	return valid;
 }
 
+function minProperties(subject, schema, result, context) {
+	var keys = Object.keys(subject);
+	if(keys.length < schema.minProperties) {
+		result.addError('Failed "minProperties" criteria', subject, schema, context);
+		return false;
+	}
+	return true;
+}
+
+function maxProperties(subject, schema, result, context) {
+	var keys = Object.keys(subject);
+	if(keys.length > schema.maxProperties) {
+		result.addError('Failed "maxProperties" criteria', subject, schema, context);
+		return false;
+	}
+	return true;
+}
+
 function required(subject, requiredProps, result, context) {
 	if(!Array.isArray(requiredProps))
 		throw new Error();
@@ -106,10 +124,12 @@ function validateObject(subject, schema, result, context) {
 
 	var handledKeys = [];
 
-	if(schema.properties) valid = valid && properties(handledKeys, subject, schema.properties, result, context);
-	if(schema.patternProperties) valid = valid && patternProperties(handledKeys, subject, schema, result, context);
-	if('additionalProperties' in schema) valid = valid && additionalProperties(handledKeys, subject, schema, result, context);
-	if(schema.required) valid = valid && required(subject, schema.required, result, context);
+	if(schema.properties) valid = properties(handledKeys, subject, schema.properties, result, context) && valid;
+	if(schema.patternProperties) valid = patternProperties(handledKeys, subject, schema, result, context) && valid;
+	if('additionalProperties' in schema) valid = additionalProperties(handledKeys, subject, schema, result, context) && valid;
+	if('minProperties' in schema) valid = minProperties(subject, schema, result, context) && valid;
+	if('maxProperties' in schema) valid = maxProperties(subject, schema, result, context) && valid;
+	if(schema.required) valid = required(subject, schema.required, result, context) && valid;
 
 	return valid;
 }

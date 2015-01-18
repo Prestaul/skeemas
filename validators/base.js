@@ -6,8 +6,6 @@ function allOf(subject, schemas, result, context) {
 	if(!Array.isArray(schemas))
 		throw new Error('Invalid schema: "allOf" value must be an array');
 
-	// @TODO: How do we set the context here?
-
 	var i = schemas.length,
 		invalidCount = 0;
 	while(i--) {
@@ -79,6 +77,20 @@ function disallow(type, subject, schema, result, context) {
 	}
 
 	return valid;
+}
+
+function validateExtends(subject, schema, result, context) {
+	var schemas = Array.isArray(schema["extends"]) ? schema["extends"] : [ schema["extends"] ];
+
+	var i = schemas.length,
+		invalidCount = 0;
+	while(i--) {
+		if(!validateBase(subject, schemas[i], result, context)) {
+			invalidCount += 1;
+		}
+	}
+
+	return invalidCount === 0;
 }
 
 function validateEnum(subject, values, result, context) {
@@ -164,14 +176,15 @@ function validateBase(subject, schema, result, context) {
 
 	var valid = true,
 		type = getType(subject);
-	if(schema.type) valid = valid && validateType(type, subject, schema, result, context);
-	if(schema.disallow) valid = valid && disallow(type, subject, schema, result, context);
-	if(schema['enum']) valid = valid && validateEnum(subject, schema['enum'], result, context);
-	valid = valid && typeValidations(type, subject, schema, result, context);
-	if(schema.allOf) valid = valid && allOf(subject, schema.allOf, result, context);
-	if(schema.anyOf) valid = valid && anyOf(subject, schema.anyOf, result, context);
-	if(schema.oneOf) valid = valid && oneOf(subject, schema.oneOf, result, context);
-	if(schema.not) valid = valid && not(subject, schema.not, result, context);
+	if(schema.type) valid = validateType(type, subject, schema, result, context) && valid;
+	if(schema.disallow) valid = disallow(type, subject, schema, result, context) && valid;
+	if(schema['enum']) valid = validateEnum(subject, schema['enum'], result, context) && valid;
+	valid = typeValidations(type, subject, schema, result, context) && valid;
+	if(schema['extends']) valid = validateExtends(subject, schema, result, context) && valid;
+	if(schema.allOf) valid = allOf(subject, schema.allOf, result, context) && valid;
+	if(schema.anyOf) valid = anyOf(subject, schema.anyOf, result, context) && valid;
+	if(schema.oneOf) valid = oneOf(subject, schema.oneOf, result, context) && valid;
+	if(schema.not) valid = not(subject, schema.not, result, context) && valid;
 
 	if(schema.id) {
 		context.id.pop();

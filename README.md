@@ -39,7 +39,7 @@ npm test
     - description
     - default
 - References
-    - [ ] definitions
+    - [X] definitions
     - [X] $ref
 - Criteria
     - any type

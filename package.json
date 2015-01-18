@@ -4,7 +4,7 @@
   "description": "Lightweight JSON Schema valiation",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --require tests/bootstrap.js tests/{**/,}/*.test.js"
+    "test": "mocha -R dot --require tests/bootstrap.js tests/{**/,}/*.test.js"
   },
   "keywords": [
     "json-schema",
@@ -17,6 +17,7 @@
   "license": "ISC",
   "devDependencies": {
     "chai": "^1.10.0",
+    "glob": "^4.3.5",
     "mocha": "^2.1.0"
   }
 }

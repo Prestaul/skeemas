@@ -71,23 +71,50 @@ function validateEnum(subject, values, result, context) {
 	return false;
 }
 
-function validateType(subject, schema, result, context) {
-	if(!(schema["type"] in validators.types))
-		throw new Error('Invalid schema: invalid type (' + schema["type"] + ')');
+function validateType(type, subject, schema, result, context) {
+	var validTypes = Array.isArray(schema.type) ? schema.type : [ schema.type ],
+		valid = validTypes.some(function(validType) {
+			if(!(validType in validators.types))
+				throw new Error('Invalid schema: invalid type (' + schema.type + ')');
 
-	return validators.types[schema["type"]](subject, schema, result, context);
+			if(validType === 'integer') return type === 'number';
+
+			return type === validType;
+		});
+
+	if(!valid) {
+		result.addError('Failed "type" criteria: expecting ' + validTypes.join(' or ') + ', found ' + type, subject, schema, context);
+	}
+
+	return valid;
+}
+
+function typeValidations(type, subject, schema, result, context) {
+	return validators.types[schema.type || type](subject, schema, result, context);
+}
+
+function getType(subject) {
+	var type = typeof subject;
+
+	if(type === 'object') {
+		if(subject === null) return 'null';
+		if(Array.isArray(subject)) return 'array';
+	}
+	return type;
 }
 
 
 
 function validate(subject, schema, result, context) {
-	var valid = true;
+	var valid = true,
+		type = getType(subject);
+	if(schema.type) valid = valid && validateType(type, subject, schema, result, context);
+	if(schema['enum']) valid = valid && validateEnum(subject, schema['enum'], result, context);
+	valid = valid && typeValidations(type, subject, schema, result, context);
 	if(schema.allOf) valid = valid && allOf(subject, schema.allOf, result, context);
 	if(schema.anyOf) valid = valid && anyOf(subject, schema.anyOf, result, context);
 	if(schema.oneOf) valid = valid && oneOf(subject, schema.oneOf, result, context);
 	if(schema.not) valid = valid && not(subject, schema.not, result, context);
-	if(schema['enum']) valid = valid && validateEnum(subject, schema['enum'], result, context);
-	if(schema["type"]) valid = valid && validateType(subject, schema, result, context);
 	return valid;
 }
 

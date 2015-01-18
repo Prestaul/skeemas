@@ -27,3 +27,74 @@ git submodule update
 # run the tests
 npm test
 ```
+
+
+
+## Feature Status
+
+- Ignored properties
+    - $schema
+    - title
+    - description
+    - default
+- References
+    - definitions
+    - $ref
+- Criteria
+    - any type
+        - [ ] allOf
+        - [ ] anyOf
+        - [ ] oneOf
+        - [ ] not
+        - [ ] enum
+        - [ ] required
+        - [ ] disallow
+    - [X] array
+        - [ ] items
+        - [ ] additionalItems
+        - [ ] minItems
+        - [ ] maxItems
+        - [ ] uniqueItems
+    - [X] boolean
+    - [X] null
+    - number, integer
+        - [X] multipleOf
+        - [X] divisibleBy
+        - [X] minimum
+        - [X] maximum
+        - [X] exclusiveMinimum
+        - [X] exclusiveMaximum
+    - [X] object
+        - [ ] properties
+        - [ ] patternProperties
+        - [ ] additionalProperties
+        - [ ] required
+        - [ ] minProperties
+        - [ ] maxProperties
+        - dependencies
+    - [X] string
+        - [X] minLength
+        - [X] maxLength
+        - [X] pattern
+        - [X] format
+            - v4
+                - [X] date-time
+                - [X] email
+                - [X] hostname
+                - [X] ipv4
+                - [X] ipv6
+                - [X] uri
+            - v3
+                - [X] date-time
+                - [X] date
+                - [X] time
+                - [X] utc-millisec
+                - [X] regex
+                - [X] color
+                - [ ] style
+                - [ ] phone
+                - [X] uri
+                - [X] email
+                - [X] ip-address
+                - [X] ipv6
+                - [X] host-name

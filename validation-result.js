@@ -2,7 +2,7 @@ var protoValidationResult = {
 	addError: function(message, subject, criteria, context) {
 		this.errors.push({
 			message: message,
-			context: context.join('.'),
+			context: context.path.join('.'),
 			value: subject,
 			criteria: criteria
 		});

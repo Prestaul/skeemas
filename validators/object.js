@@ -5,7 +5,7 @@ function properties(keys, subject, props, result, context) {
 	for(var key in props) {
 		if(key in subject) {
 			keys.push(key);
-			valid = valid && validate(subject[key], props[key], result, context.concat(key));
+			valid = valid && validate(subject[key], props[key], result, context.path.concat(key));
 		}
 	}
 

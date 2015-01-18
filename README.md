@@ -34,6 +34,7 @@ npm test
 
 - Ignored properties
     - $schema
+    - id
     - title
     - description
     - default

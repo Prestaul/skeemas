@@ -7,7 +7,7 @@ describe('JSON Schema Test Suite -', function() {
 	function addTests(description, files) {
 		describe(description, function() {
 			files.forEach(function(file) {
-				if(!/\/(additionalItems|default|disallow|divisibleBy|enum|format|items|maximum|maxItems|maxLength|minimum|minItems|minLength|pattern|required|type)\.json/.test(file)) return;
+				if(!/\/(additionalItems|default|disallow|divisibleBy|enum|format|items|maximum|maxItems|maxLength|minimum|minItems|minLength|pattern|required|type|uniqueItems)\.json/.test(file)) return;
 				// if(!/\/(type)\.json/.test(file)) return;
 
 				// Load the suite

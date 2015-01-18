@@ -56,7 +56,7 @@ npm test
         - [X] additionalItems
         - [X] minItems
         - [X] maxItems
-        - [ ] uniqueItems
+        - [X] uniqueItems
     - [X] boolean
     - [X] null
     - number, integer

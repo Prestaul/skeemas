@@ -1,4 +1,5 @@
-var validateBase = require('./base');
+var validateBase = require('./base'),
+	deepEqual = require('./deep-equal');
 
 function items(subject, items, result, context) {
 	if(typeof items !== 'object')
@@ -69,6 +70,17 @@ function maxItems(subject, schema, result, context) {
 }
 
 function uniqueItems(subject, schema, result, context) {
+	var i = subject.length, j;
+
+	while(i--) {
+		j = i;
+		while(j--) {
+			if(deepEqual(subject[i], subject[j])) {
+				result.addError('Failed "uniqueItems" criteria', subject, schema, context);
+				return false;
+			}
+		}
+	}
 
 	return true;
 }
@@ -84,6 +96,7 @@ module.exports = function(subject, schema, result, context) {
 
 	if('minItems' in schema) valid = minItems(subject, schema, result, context) && valid;
 	if('maxItems' in schema) valid = maxItems(subject, schema, result, context) && valid;
+	if(schema.uniqueItems) valid = uniqueItems(subject, schema, result, context) && valid;
 
 	if(Array.isArray(schema.items)) {
 		valid = tupleItems(subject, schema.items, result, context) && valid;

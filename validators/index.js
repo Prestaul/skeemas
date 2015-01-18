@@ -1,4 +1,5 @@
 exports.types = {
+	'any': function() { return true; },
 	'array': require('./array'),
 	'boolean': require('./boolean'),
 	'integer': require('./number'),

@@ -5,7 +5,10 @@ function properties(keys, subject, props, result, context) {
 	for(var key in props) {
 		if(key in subject) {
 			keys.push(key);
-			valid = valid && validateBase(subject[key], props[key], result, context.path.concat(key));
+			valid = valid && validateBase(subject[key], props[key], result, {
+				schema: context.schema,
+				path: context.path.concat(key)
+			});
 		} else if(props[key].required) {
 			result.addError('Failed "required" criteria: missing property (' + key + ')', subject, props, context);
 			valid = false;

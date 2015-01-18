@@ -49,11 +49,11 @@ npm test
         - [ ] not
         - [X] enum
         - [X] required
-        - [ ] disallow
+        - [X] disallow
         - [ ] extends
     - [X] array
-        - [ ] items
-        - [ ] additionalItems
+        - [X] items
+        - [X] additionalItems
         - [X] minItems
         - [X] maxItems
         - [ ] uniqueItems

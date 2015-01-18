@@ -68,7 +68,7 @@ npm test
         - [X] exclusiveMaximum
     - [X] object
         - [X] properties
-        - [ ] patternProperties
+        - [X] patternProperties
         - [ ] additionalProperties
         - [X] required
         - [ ] dependencies

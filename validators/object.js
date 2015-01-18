@@ -1,15 +1,13 @@
 var validateBase = require('./base');
 
-function properties(keys, subject, props, result, context) {
+function properties(handledKeys, subject, props, result, context) {
 	var valid = true;
 	for(var key in props) {
 		if(key in subject) {
-			keys.push(key);
-			valid = valid && validateBase(subject[key], props[key], result, {
-				schema: context.schema,
-				path: context.path.concat(key),
-				refs: context.refs
-			});
+			handledKeys.push(key);
+			context.path.push(key);
+			valid = validateBase(subject[key], props[key], result, context) && valid;
+			context.path.pop();
 		} else if(props[key].required) {
 			result.addError('Failed "required" criteria: missing property (' + key + ')', subject, props, context);
 			valid = false;
@@ -19,15 +17,39 @@ function properties(keys, subject, props, result, context) {
 	return valid;
 }
 
-function patternProperties(keys, subject, patternProps, result, context) {
-	if(!Array.isArray(patternProps))
-		throw new Error();
+function patternProperties(handledKeys, subject, schema, result, context) {
+	var patternProps = schema.patternProperties;
 
+	if(typeof patternProps !== 'object')
+		throw new Error('Invalid schema: "patternProperties" must be an object');
 
-	return true;
+	var valid = true,
+		patterns = Object.keys(patternProps),
+		len = patterns.length,
+		keys = Object.keys(subject),
+		i = keys.length,
+		j, key;
+
+	while(i--) {
+		key = keys[i];
+
+		if(~handledKeys.indexOf(key)) continue;
+
+		j = len;
+		while(j--) {
+			if(key.match(patterns[j])) {
+				handledKeys.push(key);
+				context.path.push(key);
+				valid = validateBase(subject[key], patternProps[patterns[j]], result, context) && valid;
+				context.path.pop();
+			}
+		}
+	}
+
+	return valid;
 }
 
-function additionalProperties(validKeys, subject, schema, result, context) {
+function additionalProperties(handledKeys, subject, schema, result, context) {
 	var additionalProps = schema.additionalProperties;
 
 	if(additionalProps === true) return true;
@@ -35,7 +57,7 @@ function additionalProperties(validKeys, subject, schema, result, context) {
 		var keys = Object.keys(subject),
 			i = keys.length;
 		while(i--) {
-			if(!~validKeys.indexOf(keys[i])) {
+			if(!~handledKeys.indexOf(keys[i])) {
 				result.addError('Failed "additionalProperties" criteria: unexpected property (' + keys[i] + ')', subject, schema, context);
 				return false;
 			}
@@ -74,11 +96,11 @@ function validateObject(subject, schema, result, context) {
 		valid = false;
 	}
 
-	var keys = [];
+	var handledKeys = [];
 
-	if(schema.properties) valid = valid && properties(keys, subject, schema.properties, result, context);
-	if(schema.patternProperties) valid = valid && patternProperties(keys, subject, schema.patternProperties, result, context);
-	if('additionalProperties' in schema) valid = valid && additionalProperties(keys, subject, schema, result, context);
+	if(schema.properties) valid = valid && properties(handledKeys, subject, schema.properties, result, context);
+	if(schema.patternProperties) valid = valid && patternProperties(handledKeys, subject, schema, result, context);
+	if('additionalProperties' in schema) valid = valid && additionalProperties(handledKeys, subject, schema, result, context);
 	if(schema.required) valid = valid && required(subject, schema.required, result, context);
 
 	return valid;

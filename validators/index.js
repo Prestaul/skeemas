@@ -8,5 +8,7 @@ exports.types = {
 	'string': require('./string')
 };
 
+exports.deepEqual = require('./deep-equal');
+
 // base cannot be required until other validators are added
 exports.base = require('./base');

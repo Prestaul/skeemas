@@ -47,8 +47,8 @@ npm test
         - [ ] anyOf
         - [ ] oneOf
         - [ ] not
-        - [ ] enum
-        - [ ] required
+        - [X] enum
+        - [X] required
         - [ ] disallow
         - [ ] extends
     - [X] array
@@ -67,10 +67,10 @@ npm test
         - [X] exclusiveMinimum
         - [X] exclusiveMaximum
     - [X] object
-        - [ ] properties
+        - [X] properties
         - [ ] patternProperties
         - [ ] additionalProperties
-        - [ ] required
+        - [X] required
         - [ ] dependencies
         - [ ] minProperties
         - [ ] maxProperties

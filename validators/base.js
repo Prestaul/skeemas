@@ -65,7 +65,7 @@ function validateEnum(subject, values, result, context) {
 
 	var i = values.length;
 	while(i--) {
-		if(subject === values[i]) return true;
+		if(validators.deepEqual(subject, values[i])) return true;
 	}
 
 	result.addError('Failed "enum" criteria', subject, values, context);
@@ -130,6 +130,7 @@ function validate(subject, schema, result, context) {
 	if(schema.anyOf) valid = valid && anyOf(subject, schema.anyOf, result, context);
 	if(schema.oneOf) valid = valid && oneOf(subject, schema.oneOf, result, context);
 	if(schema.not) valid = valid && not(subject, schema.not, result, context);
+
 	return valid;
 }
 

@@ -1,11 +1,14 @@
-var validate = require('../');
+var validateBase = require('./base');
 
 function properties(keys, subject, props, result, context) {
 	var valid = true;
 	for(var key in props) {
 		if(key in subject) {
 			keys.push(key);
-			valid = valid && validate(subject[key], props[key], result, context.path.concat(key));
+			valid = valid && validateBase(subject[key], props[key], result, context.path.concat(key));
+		} else if(props[key].required) {
+			result.addError('Failed "required" criteria: missing property (' + key + ')', subject, props, context);
+			valid = false;
 		}
 	}
 

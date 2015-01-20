@@ -49,24 +49,27 @@ function maxLength(subject, schema, context) {
 	return true;
 }
 
-function pattern(subject, pattern, context) {
+function pattern(subject, schema, context) {
+	var pattern = schema.pattern;
+
 	if(!subject.match(pattern)) {
-		context.addError('Failed "pattern" criteria', subject, pattern);
+		context.addError('Failed "pattern" criteria (' + pattern + ')', subject, pattern);
 		return false;
 	}
 
 	return true;
 }
 
-function format(subject, format, context) {
-	var validator = formats[format];
+function format(subject, schema, context) {
+	var format = schema.format,
+		validator = formats[format];
 
 	if(!validator)
 		throw new Error('Invalid schema: unknown format (' + format + ')');
 
 	var valid = validator.test ? validator.test(subject) : validator(subject);
 	if(!valid) {
-		context.addError('Failed "format" criteria', subject, pattern);
+		context.addError('Failed "format" criteria (' + format + ')', subject, pattern);
 	}
 
 	return valid;
@@ -82,10 +85,10 @@ function validateString(subject, schema, context) {
 
 	var valid = true;
 
-	if(schema.minLength) valid = minLength(subject, schema, context) && valid;
-	if(schema.maxLength) valid = maxLength(subject, schema, context) && valid;
-	if(schema.pattern) valid = pattern(subject, schema.pattern, context) && valid;
-	if(schema.format) valid = format(subject, schema.format, context) && valid;
+	if('minLength' in schema) valid = minLength(subject, schema, context) && valid;
+	if('maxLength' in schema) valid = maxLength(subject, schema, context) && valid;
+	if('pattern' in schema) valid = pattern(subject, schema, context) && valid;
+	if('format' in schema) valid = format(subject, schema, context) && valid;
 
 	return valid;
 }

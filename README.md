@@ -94,8 +94,8 @@ npm test
                 - [X] utc-millisec
                 - [X] regex
                 - [X] color
-                - [ ] style
-                - [ ] phone
+                - [X] style
+                - [X] phone
                 - [X] uri
                 - [X] email
                 - [X] ip-address

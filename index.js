@@ -1,31 +1,21 @@
 var validators = require('./validators'),
-	validationResult = require('./validation-result'),
+	validationContext = require('./validation-context'),
 	jsonRefs = require('skeemas-json-refs');
 
 module.exports = function() {
 	var refs = jsonRefs();
 	return {
 		refs: refs,
-		validate: function(subject, schema) {
-			var result = validationResult();
-			validators.base(subject, schema, result, {
-				id: [],
-				schema: schema,
-				path: ['subject'],
-				refs: refs
-			});
-			return result;
+		validate: function(instance, schema) {
+			var context = validationContext({ instance:instance, schema:schema, refs:refs });
+			validators.base(instance, schema, context.result, context);
+			return context.result;
 		}
 	};
 };
 
-module.exports.validate = function(subject, schema) {
-	var result = validationResult();
-	validators.base(subject, schema, result, {
-		id: [],
-		schema: schema,
-		path: ['subject'],
-		refs: jsonRefs()
-	});
-	return result;
+module.exports.validate = function(instance, schema) {
+	var context = validationContext({ instance:instance, schema:schema });
+	validators.base(instance, schema, context.result, context);
+	return context.result;
 };

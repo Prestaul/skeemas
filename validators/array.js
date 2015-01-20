@@ -1,32 +1,38 @@
 var validateBase = require('./base'),
 	deepEqual = require('./deep-equal');
 
-function items(subject, items, result, context) {
+function items(subject, items, context) {
 	if(typeof items !== 'object')
 		throw new Error('Invalid schema: invalid "items"');
 
 	var lastPath = context.path.length;
 	for(var i = 0, len = subject.length; i < len; i++) {
 		context.path[lastPath] = i;
-		if(!validateBase(subject[i], items, result, context)) return false;
+		if(!validateBase(subject[i], items, context)) {
+			context.addError('Failed "items" criteria', subject, items);
+			return false;
+		}
 	}
 	context.length = lastPath;
 
 	return true;
 }
 
-function tupleItems(subject, items, result, context) {
+function tupleItems(subject, items, context) {
 	var lastPath = context.path.length;
 	for(var i = 0, len = items.length; i < len; i++) {
 		context.path[lastPath] = i;
-		if(!validateBase(subject[i], items[i], result, context)) return false;
+		if(!validateBase(subject[i], items[i], context)) {
+			context.addError('Failed "items" criteria', subject, items);
+			return false;
+		}
 	}
 	context.length = lastPath;
 
 	return true;
 }
 
-function additionalItems(subject, schema, result, context) {
+function additionalItems(subject, schema, context) {
 	var i = schema.items.length,
 		len = subject.length,
 		additionalItems = schema.additionalItems;
@@ -34,7 +40,7 @@ function additionalItems(subject, schema, result, context) {
 	if(additionalItems === false) {
 		if(len <= i) return true;
 
-		result.addError('Failed "additionalItems" criteria: no additional items are allowed', subject, schema, context);
+		context.addError('Failed "additionalItems" criteria: no additional items are allowed', subject, schema);
 		return false;
 	}
 
@@ -44,39 +50,42 @@ function additionalItems(subject, schema, result, context) {
 	var lastPath = context.path.length;
 	for(; i < len; i++) {
 		context.path[lastPath] = i;
-		if(!validateBase(subject[i], additionalItems, result, context)) return false;
+		if(!validateBase(subject[i], additionalItems, context)) {
+			context.addError('Failed "additionalItems" criteria', subject, schema);
+			return false;
+		}
 	}
 	context.length = lastPath;
 
 	return true;
 }
 
-function minItems(subject, schema, result, context) {
+function minItems(subject, schema, context) {
 	if(subject.length < schema.minItems) {
-		result.addError('Failed "minItems" criteria', subject, schema, context);
+		context.addError('Failed "minItems" criteria', subject, schema);
 		return false;
 	}
 
 	return true;
 }
 
-function maxItems(subject, schema, result, context) {
+function maxItems(subject, schema, context) {
 	if(subject.length > schema.maxItems) {
-		result.addError('Failed "maxItems" criteria', subject, schema, context);
+		context.addError('Failed "maxItems" criteria', subject, schema);
 		return false;
 	}
 
 	return true;
 }
 
-function uniqueItems(subject, schema, result, context) {
+function uniqueItems(subject, schema, context) {
 	var i = subject.length, j;
 
 	while(i--) {
 		j = i;
 		while(j--) {
 			if(deepEqual(subject[i], subject[j])) {
-				result.addError('Failed "uniqueItems" criteria', subject, schema, context);
+				context.addError('Failed "uniqueItems" criteria', subject, schema);
 				return false;
 			}
 		}
@@ -86,23 +95,23 @@ function uniqueItems(subject, schema, result, context) {
 }
 
 
-module.exports = function(subject, schema, result, context) {
+module.exports = function(subject, schema, context) {
 	if(!Array.isArray(subject)) {
-		result.addError('Failed type:array criteria', schema, result, context);
+		context.addError('Failed type:array criteria', schema);
 		return false;
 	}
 
 	var valid = true;
 
-	if('minItems' in schema) valid = minItems(subject, schema, result, context) && valid;
-	if('maxItems' in schema) valid = maxItems(subject, schema, result, context) && valid;
-	if(schema.uniqueItems) valid = uniqueItems(subject, schema, result, context) && valid;
+	if('minItems' in schema) valid = minItems(subject, schema, context) && valid;
+	if('maxItems' in schema) valid = maxItems(subject, schema, context) && valid;
+	if(schema.uniqueItems) valid = uniqueItems(subject, schema, context) && valid;
 
 	if(Array.isArray(schema.items)) {
-		valid = tupleItems(subject, schema.items, result, context) && valid;
-		if('additionalItems' in schema) valid = additionalItems(subject, schema, result, context) && valid;
+		valid = tupleItems(subject, schema.items, context) && valid;
+		if('additionalItems' in schema) valid = additionalItems(subject, schema, context) && valid;
 	} else if(schema.items) {
-		valid = items(subject, schema.items, result, context) && valid;
+		valid = items(subject, schema.items, context) && valid;
 	}
 
 	return valid;

@@ -44,5 +44,4 @@ var deepEqual = module.exports = function(a, b) {
 	if(t === 'object') return objectEqual(a, b);
 
 	return false;
-	// return a == b;
 };

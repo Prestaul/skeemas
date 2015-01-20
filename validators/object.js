@@ -1,15 +1,15 @@
 var validateBase = require('./base');
 
-function properties(handledKeys, subject, props, result, context) {
+function properties(handledKeys, subject, props, context) {
 	var valid = true;
 	for(var key in props) {
 		if(key in subject) {
 			handledKeys.push(key);
 			context.path.push(key);
-			valid = validateBase(subject[key], props[key], result, context) && valid;
+			valid = validateBase(subject[key], props[key], context) && valid;
 			context.path.pop();
 		} else if(props[key].required) {
-			result.addError('Failed "required" criteria: missing property (' + key + ')', subject, props, context);
+			context.addError('Failed "required" criteria: missing property (' + key + ')', subject, props);
 			valid = false;
 		}
 	}
@@ -17,7 +17,7 @@ function properties(handledKeys, subject, props, result, context) {
 	return valid;
 }
 
-function patternProperties(handledKeys, subject, schema, result, context) {
+function patternProperties(handledKeys, subject, schema, context) {
 	var patternProps = schema.patternProperties;
 
 	if(typeof patternProps !== 'object')
@@ -38,7 +38,7 @@ function patternProperties(handledKeys, subject, schema, result, context) {
 			if(key.match(patterns[j])) {
 				if(!~handledKeys.indexOf(key)) handledKeys.push(key);
 				context.path.push(key);
-				valid = validateBase(subject[key], patternProps[patterns[j]], result, context) && valid;
+				valid = validateBase(subject[key], patternProps[patterns[j]], context) && valid;
 				context.path.pop();
 			}
 		}
@@ -47,7 +47,7 @@ function patternProperties(handledKeys, subject, schema, result, context) {
 	return valid;
 }
 
-function additionalProperties(handledKeys, subject, schema, result, context) {
+function additionalProperties(handledKeys, subject, schema, context) {
 	var additionalProps = schema.additionalProperties;
 
 	if(additionalProps === true) return true;
@@ -57,7 +57,7 @@ function additionalProperties(handledKeys, subject, schema, result, context) {
 	if(additionalProps === false) {
 		while(i--) {
 			if(!~handledKeys.indexOf(keys[i])) {
-				result.addError('Failed "additionalProperties" criteria: unexpected property (' + keys[i] + ')', subject, schema, context);
+				context.addError('Failed "additionalProperties" criteria: unexpected property (' + keys[i] + ')', subject, schema);
 				return false;
 			}
 		}
@@ -72,32 +72,32 @@ function additionalProperties(handledKeys, subject, schema, result, context) {
 		if(~handledKeys.indexOf(keys[i])) continue;
 
 		context.path.push(keys[i]);
-		valid = validateBase(subject[keys[i]], additionalProps, result, context) && valid;
+		valid = validateBase(subject[keys[i]], additionalProps, context) && valid;
 		context.path.pop();
 	}
 
 	return valid;
 }
 
-function minProperties(subject, schema, result, context) {
+function minProperties(subject, schema, context) {
 	var keys = Object.keys(subject);
 	if(keys.length < schema.minProperties) {
-		result.addError('Failed "minProperties" criteria', subject, schema, context);
+		context.addError('Failed "minProperties" criteria', subject, schema);
 		return false;
 	}
 	return true;
 }
 
-function maxProperties(subject, schema, result, context) {
+function maxProperties(subject, schema, context) {
 	var keys = Object.keys(subject);
 	if(keys.length > schema.maxProperties) {
-		result.addError('Failed "maxProperties" criteria', subject, schema, context);
+		context.addError('Failed "maxProperties" criteria', subject, schema);
 		return false;
 	}
 	return true;
 }
 
-function required(subject, requiredProps, result, context) {
+function required(subject, requiredProps, context) {
 	if(!Array.isArray(requiredProps))
 		throw new Error('Invalid schema: "required" must be an array');
 
@@ -105,7 +105,7 @@ function required(subject, requiredProps, result, context) {
 		i = requiredProps.length;
 	while(i--) {
 		if(!(requiredProps[i] in subject)) {
-			result.addError('Missing required property "' + requiredProps[i] + '"', subject, requiredProps[i], context);
+			context.addError('Missing required property "' + requiredProps[i] + '"', subject, requiredProps[i]);
 			valid = false;
 		}
 	}
@@ -113,7 +113,7 @@ function required(subject, requiredProps, result, context) {
 	return valid;
 }
 
-function dependencies(subject, deps, result, context) {
+function dependencies(subject, deps, context) {
 	if(typeof deps !== 'object')
 		throw new Error('Invalid schema: "dependencies" must be an object');
 
@@ -133,12 +133,12 @@ function dependencies(subject, deps, result, context) {
 			j = requiredProps.length;
 			while(j--) {
 				if(!(requiredProps[j] in subject)) {
-					result.addError('Missing required property "' + requiredProps[j] + '"', subject, requiredProps[j], context);
+					context.addError('Missing required property "' + requiredProps[j] + '"', subject, requiredProps[j]);
 					valid = false;
 				}
 			}
 		} else if(typeof requiredProps === 'object') {
-			valid = validateBase(subject, requiredProps, result, context) && valid;
+			valid = validateBase(subject, requiredProps, context) && valid;
 		} else {
 			throw new Error('Invalid schema: dependencies must be string, array, or object');
 		}
@@ -148,23 +148,23 @@ function dependencies(subject, deps, result, context) {
 }
 
 
-function validateObject(subject, schema, result, context) {
+function validateObject(subject, schema, context) {
 	var valid = true;
 
 	if(typeof subject !== 'object') {
-		result.addError('Failed type:object criteria', subject, schema, context);
+		context.addError('Failed type:object criteria', subject, schema);
 		valid = false;
 	}
 
 	var handledKeys = [];
 
-	if(schema.properties) valid = properties(handledKeys, subject, schema.properties, result, context) && valid;
-	if(schema.patternProperties) valid = patternProperties(handledKeys, subject, schema, result, context) && valid;
-	if('additionalProperties' in schema) valid = additionalProperties(handledKeys, subject, schema, result, context) && valid;
-	if('minProperties' in schema) valid = minProperties(subject, schema, result, context) && valid;
-	if('maxProperties' in schema) valid = maxProperties(subject, schema, result, context) && valid;
-	if(schema.required) valid = required(subject, schema.required, result, context) && valid;
-	if(schema.dependencies) valid = dependencies(subject, schema.dependencies, result, context) && valid;
+	if(schema.properties) valid = properties(handledKeys, subject, schema.properties, context) && valid;
+	if(schema.patternProperties) valid = patternProperties(handledKeys, subject, schema, context) && valid;
+	if('additionalProperties' in schema) valid = additionalProperties(handledKeys, subject, schema, context) && valid;
+	if('minProperties' in schema) valid = minProperties(subject, schema, context) && valid;
+	if('maxProperties' in schema) valid = maxProperties(subject, schema, context) && valid;
+	if(schema.required) valid = required(subject, schema.required, context) && valid;
+	if(schema.dependencies) valid = dependencies(subject, schema.dependencies, context) && valid;
 
 	return valid;
 }

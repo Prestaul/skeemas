@@ -1,6 +1,6 @@
-function validateNull(subject, schema, result, context) {
+function validateNull(subject, schema, context) {
 	if(subject !== null) {
-		result.addError('Failed type:null criteria', schema, result, context);
+		context.addError('Failed type:null criteria', subject, schema);
 		return false;
 	}
 	return true;

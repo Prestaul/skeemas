@@ -7,15 +7,15 @@ module.exports = function() {
 	return {
 		refs: refs,
 		validate: function(instance, schema) {
-			var context = validationContext({ instance:instance, schema:schema, refs:refs });
-			validators.base(instance, schema, context.result, context);
+			var context = validationContext(schema, { instance:instance, refs:refs });
+			validators.base(instance, schema, context);
 			return context.result;
 		}
 	};
 };
 
 module.exports.validate = function(instance, schema) {
-	var context = validationContext({ instance:instance, schema:schema });
-	validators.base(instance, schema, context.result, context);
+	var context = validationContext(schema, { instance:instance });
+	validators.base(instance, schema, context);
 	return context.result;
 };

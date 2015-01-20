@@ -1,6 +1,6 @@
-function validateBoolean(subject, schema, result, context) {
+function validateBoolean(subject, schema, context) {
 	if(typeof subject !== 'boolean') {
-		result.addError('Failed type:boolean criteria', schema, result, context);
+		context.addError('Failed type:boolean criteria', subject, schema);
 		return false;
 	}
 	return true;

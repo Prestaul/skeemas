@@ -10,4 +10,4 @@ validator.refs
 
 global.validate = validator.validate;
 global.validators = require('../validators');
-global.validationResult = require('../validation-result');
+global.validationContext = require('../validation-context')

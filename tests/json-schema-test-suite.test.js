@@ -14,8 +14,7 @@ describe('JSON Schema Test Suite -', function() {
 					(skip ? describe.skip : describe)(suite.description, function() {
 						// Load the tests
 						suite.tests.forEach(function(test) {
-
-							// Create individula tests
+							// Create individual tests
 							it(test.description, function() {
 								var result = validate(test.data, suite.schema);
 								assert.strictEqual(result.valid, test.valid, test.valid ? 'validates the instance' : 'invalidates the instance');

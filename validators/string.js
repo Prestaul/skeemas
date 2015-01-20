@@ -31,34 +31,34 @@ formats['host-name'] = formats.hostname;
 formats['ip-address'] = formats.ipv4;
 
 
-function minLength(subject, schema, result, context) {
+function minLength(subject, schema, context) {
 	if(decode(subject).length < schema.minLength) {
-		result.addError('Failed "minLength" criteria', subject, schema, context);
+		context.addError('Failed "minLength" criteria', subject, schema);
 		return false;
 	}
 
 	return true;
 }
 
-function maxLength(subject, schema, result, context) {
+function maxLength(subject, schema, context) {
 	if(decode(subject).length > schema.maxLength) {
-		result.addError('Failed "maxLength" criteria', subject, schema, context);
+		context.addError('Failed "maxLength" criteria', subject, schema);
 		return false;
 	}
 
 	return true;
 }
 
-function pattern(subject, pattern, result, context) {
+function pattern(subject, pattern, context) {
 	if(!subject.match(pattern)) {
-		result.addError('Failed "pattern" criteria', subject, pattern, context);
+		context.addError('Failed "pattern" criteria', subject, pattern);
 		return false;
 	}
 
 	return true;
 }
 
-function format(subject, format, result, context) {
+function format(subject, format, context) {
 	var validator = formats[format];
 
 	if(!validator)
@@ -66,7 +66,7 @@ function format(subject, format, result, context) {
 
 	var valid = validator.test ? validator.test(subject) : validator(subject);
 	if(!valid) {
-		result.addError('Failed "format" criteria', subject, pattern, context);
+		context.addError('Failed "format" criteria', subject, pattern);
 	}
 
 	return valid;
@@ -74,18 +74,18 @@ function format(subject, format, result, context) {
 
 
 
-function validateString(subject, schema, result, context) {
+function validateString(subject, schema, context) {
 	if(typeof subject !== 'string') {
-		result.addError('Failed type:string criteria', schema, result, context);
+		context.addError('Failed type:string criteria', schema);
 		return false;
 	}
 
 	var valid = true;
 
-	if(schema.minLength) valid = minLength(subject, schema, result, context) && valid;
-	if(schema.maxLength) valid = maxLength(subject, schema, result, context) && valid;
-	if(schema.pattern) valid = pattern(subject, schema.pattern, result, context) && valid;
-	if(schema.format) valid = format(subject, schema.format, result, context) && valid;
+	if(schema.minLength) valid = minLength(subject, schema, context) && valid;
+	if(schema.maxLength) valid = maxLength(subject, schema, context) && valid;
+	if(schema.pattern) valid = pattern(subject, schema.pattern, context) && valid;
+	if(schema.format) valid = format(subject, schema.format, context) && valid;
 
 	return valid;
 }

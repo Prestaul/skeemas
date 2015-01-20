@@ -36,7 +36,7 @@ function maximum(subject, schema, context) {
 	return valid;
 }
 
-function multipleOf(key, subject, schema, context) {
+function multipleOf(subject, schema, context, key) {
 	var valid = !(subject / schema[key] % 1);
 
 	if(!valid) context.addError('Failed "' + key + '" criteria', subject, schema);
@@ -47,14 +47,15 @@ function multipleOf(key, subject, schema, context) {
 
 
 module.exports = function(subject, schema, context) {
-	var valid = true, isType = true;
+	var valid = true,
+		isType = true;
 
 	if(schema.type === 'number') isType = validateNumber(subject, schema, context);
 	if(schema.type === 'integer') isType = validateInteger(subject, schema, context);
 	if(isType && 'minimum' in schema) valid = minimum(subject, schema, context) && valid;
 	if(isType && 'maximum' in schema) valid = maximum(subject, schema, context) && valid;
-	if(isType && schema.multipleOf) valid = multipleOf('multipleOf', subject, schema, context) && valid;
-	if(isType && schema.divisibleBy) valid = multipleOf('divisibleBy', subject, schema, context) && valid;
+	if(isType && 'multipleOf' in schema) valid = multipleOf(subject, schema, context, 'multipleOf') && valid;
+	if(isType && 'divisibleBy' in schema) valid = multipleOf(subject, schema, context, 'divisibleBy') && valid;
 
 	return isType && valid;
 };

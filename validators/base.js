@@ -14,7 +14,7 @@ function getType(subject) {
 }
 
 
-function allOf(subject, schema, context) {
+function allOf(context, subject, schema) {
 	var schemas = schema.allOf;
 
 	if(!Array.isArray(schemas))
@@ -23,7 +23,7 @@ function allOf(subject, schema, context) {
 	var i = schemas.length,
 		invalidCount = 0;
 	while(i--) {
-		if(!validateBase(subject, schemas[i], context)) {
+		if(!validateBase(context, subject, schemas[i])) {
 			invalidCount += 1;
 		}
 	}
@@ -34,7 +34,7 @@ function allOf(subject, schema, context) {
 	return false;
 }
 
-function anyOf(subject, schema, context) {
+function anyOf(context, subject, schema) {
 	var schemas = schema.anyOf;
 
 	if(!Array.isArray(schemas))
@@ -43,7 +43,7 @@ function anyOf(subject, schema, context) {
 	var matched = context.silently(function() {
 		var i = schemas.length;
 		while(i--) {
-			if(validateBase(subject, schemas[i], context)) return true;
+			if(validateBase(context, subject, schemas[i])) return true;
 		}
 		return false;
 	});
@@ -54,7 +54,7 @@ function anyOf(subject, schema, context) {
 	return false;
 }
 
-function oneOf(subject, schema, context) {
+function oneOf(context, subject, schema) {
 	var schemas = schema.oneOf;
 
 	if(!Array.isArray(schemas))
@@ -64,7 +64,7 @@ function oneOf(subject, schema, context) {
 		validCount = 0;
 	context.silently(function() {
 		while(i--) {
-			if(validateBase(subject, schemas[i], context)) validCount += 1;
+			if(validateBase(context, subject, schemas[i])) validCount += 1;
 		}
 	});
 
@@ -74,10 +74,10 @@ function oneOf(subject, schema, context) {
 	return false;
 }
 
-function not(subject, schema, context) {
+function not(context, subject, schema) {
 	var badSchema = schema.not,
 		valid = context.silently(function() {
-			return !validateBase(subject, badSchema, context);
+			return !validateBase(context, subject, badSchema);
 		});
 
 	if(valid) return true;
@@ -86,14 +86,14 @@ function not(subject, schema, context) {
 	return false;
 }
 
-function disallow(subject, schema, context, type) {
+function disallow(context, subject, schema, type) {
 	var invalidTypes = Array.isArray(schema.disallow) ? schema.disallow : [ schema.disallow ],
 		valid = !invalidTypes.some(function(invalidType) {
 			if(invalidType === 'any') return true;
 
 			if(typeof invalidType === 'object') {
 				return context.silently(function() {
-					return validateBase(subject, invalidType, context);
+					return validateBase(context, subject, invalidType);
 				});
 			}
 
@@ -112,13 +112,13 @@ function disallow(subject, schema, context, type) {
 	return valid;
 }
 
-function validateExtends(subject, schema, context) {
+function validateExtends(context, subject, schema) {
 	var schemas = Array.isArray(schema["extends"]) ? schema["extends"] : [ schema["extends"] ];
 
 	var i = schemas.length,
 		invalidCount = 0;
 	while(i--) {
-		if(!validateBase(subject, schemas[i], context)) {
+		if(!validateBase(context, subject, schemas[i])) {
 			invalidCount += 1;
 		}
 	}
@@ -126,7 +126,7 @@ function validateExtends(subject, schema, context) {
 	return invalidCount === 0;
 }
 
-function validateEnum(subject, schema, context) {
+function validateEnum(context, subject, schema) {
 	var values = schema['enum'];
 
 	if(!Array.isArray(values))
@@ -141,14 +141,14 @@ function validateEnum(subject, schema, context) {
 	return false;
 }
 
-function validateType(subject, schema, context, type) {
+function validateType(context, subject, schema, type) {
 	var validTypes = Array.isArray(schema.type) ? schema.type : [ schema.type ],
 		valid = validTypes.some(function(validType) {
 			if(validType === 'any') return true;
 
 			if(typeof validType === 'object') {
 				return context.silently(function() {
-					return validateBase(subject, validType, context);
+					return validateBase(context, subject, validType);
 				});
 			}
 
@@ -167,11 +167,11 @@ function validateType(subject, schema, context, type) {
 	return valid;
 }
 
-function typeValidations(subject, schema, context, type) {
-	return validators.types[type](subject, schema, context);
+function typeValidations(context, subject, schema, type) {
+	return validators.types[type](context, subject, schema);
 }
 
-function $ref(subject, schema, context) {
+function $ref(context, subject, schema) {
 	var absolute = /^#|\//.test(schema.$ref),
 		ref = absolute ? schema.$ref : context.id.join('') + schema.$ref,
 		refSchema = context.refs.get(ref, context.schema);
@@ -180,31 +180,48 @@ function $ref(subject, schema, context) {
 		context = context.subcontext(context.refs.get(ref, context.schema, true));
 	}
 
-	return validateBase(subject, refSchema, context);
+	return validateBase(context, subject, refSchema);
 }
 
 
 
-function validateBase(subject, schema, context) {
+function runValidations(validations, context, subject, schema) {
+	var breakOnError = context.breakOnError,
+		args = Array.prototype.slice.call(arguments, 1),
+		valid = true,
+		validation;
+
+	for(var i = 0, len = validations.length; i < len; i++) {
+		validation = validations[i];
+		if(!validation[0]) continue;
+		valid = validation[1].apply(null, args) && valid;
+		if(breakOnError && !valid) return false;
+	}
+
+	return valid;
+}
+
+
+function validateBase(context, subject, schema) {
 	if(schema.$ref) {
-		return $ref(subject, schema, context);
+		return $ref(context, subject, schema);
 	}
 
 	if(schema.id) {
 		context.id.push(schema.id);
 	}
 
-	var valid = true,
-		type = getType(subject);
-	if('type' in schema) valid = validateType(subject, schema, context, type) && valid;
-	if('disallow' in schema) valid = disallow(subject, schema, context, type) && valid;
-	if('enum' in schema) valid = validateEnum(subject, schema, context) && valid;
-	valid = typeValidations(subject, schema, context, type) && valid;
-	if('extends' in schema) valid = validateExtends(subject, schema, context) && valid;
-	if('allOf' in schema) valid = allOf(subject, schema, context) && valid;
-	if('anyOf' in schema) valid = anyOf(subject, schema, context) && valid;
-	if('oneOf' in schema) valid = oneOf(subject, schema, context) && valid;
-	if('not' in schema) valid = not(subject, schema, context) && valid;
+	var valid = context.runValidations([
+		[ 'type' in schema, validateType ],
+		[ 'disallow' in schema, disallow ],
+		[ 'enum' in schema, validateEnum ],
+		[ true, typeValidations ],
+		[ 'extends' in schema, validateExtends ],
+		[ 'allOf' in schema, allOf ],
+		[ 'anyOf' in schema, anyOf ],
+		[ 'oneOf' in schema, oneOf ],
+		[ 'not' in schema, not ]
+	], subject, schema, getType(subject));
 
 	if(schema.id) {
 		context.id.pop();

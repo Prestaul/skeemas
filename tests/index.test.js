@@ -63,5 +63,17 @@ describe('Validate', function() {
 			assert.isArray(result.errors);
 			assert.lengthOf(result.errors, 1);
 		});
+
+		it('should have multiple errors when multiple conditions are invalid', function() {
+			var result = validate('test', { enum:['foobar'], minLength:5 });
+			assert.isArray(result.errors);
+			assert.lengthOf(result.errors, 2);
+		});
+
+		it('should have single error if breakOnError', function() {
+			var result = validate('test', { enum:['foobar'], minLength:5 }, true);
+			assert.isArray(result.errors);
+			assert.lengthOf(result.errors, 1);
+		});
 	});
 });

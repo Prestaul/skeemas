@@ -31,7 +31,7 @@ formats['host-name'] = formats.hostname;
 formats['ip-address'] = formats.ipv4;
 
 
-function minLength(subject, schema, context) {
+function minLength(context, subject, schema) {
 	if(decode(subject).length < schema.minLength) {
 		context.addError('Failed "minLength" criteria', subject, schema);
 		return false;
@@ -40,7 +40,7 @@ function minLength(subject, schema, context) {
 	return true;
 }
 
-function maxLength(subject, schema, context) {
+function maxLength(context, subject, schema) {
 	if(decode(subject).length > schema.maxLength) {
 		context.addError('Failed "maxLength" criteria', subject, schema);
 		return false;
@@ -49,7 +49,7 @@ function maxLength(subject, schema, context) {
 	return true;
 }
 
-function pattern(subject, schema, context) {
+function pattern(context, subject, schema) {
 	var pattern = schema.pattern;
 
 	if(!subject.match(pattern)) {
@@ -60,7 +60,7 @@ function pattern(subject, schema, context) {
 	return true;
 }
 
-function format(subject, schema, context) {
+function format(context, subject, schema) {
 	var format = schema.format,
 		validator = formats[format];
 
@@ -77,20 +77,18 @@ function format(subject, schema, context) {
 
 
 
-function validateString(subject, schema, context) {
+function validateString(context, subject, schema) {
 	if(typeof subject !== 'string') {
 		context.addError('Failed type:string criteria', schema);
 		return false;
 	}
 
-	var valid = true;
-
-	if('minLength' in schema) valid = minLength(subject, schema, context) && valid;
-	if('maxLength' in schema) valid = maxLength(subject, schema, context) && valid;
-	if('pattern' in schema) valid = pattern(subject, schema, context) && valid;
-	if('format' in schema) valid = format(subject, schema, context) && valid;
-
-	return valid;
+	return context.runValidations([
+		[ 'minLength' in schema, minLength ],
+		[ 'maxLength' in schema, maxLength ],
+		[ 'pattern' in schema, pattern ],
+		[ 'format' in schema, format ]
+	], subject, schema);
 }
 
 module.exports = validateString;

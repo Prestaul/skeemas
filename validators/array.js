@@ -1,7 +1,18 @@
 var validateBase = require('./base'),
 	deepEqual = require('./deep-equal');
 
-function items(subject, schema, context) {
+function items(context, subject, schema) {
+	var valid = true;
+	if(Array.isArray(schema.items)) {
+		valid = tupleItems(context, subject, schema);
+		if('additionalItems' in schema) valid = additionalItems(context, subject, schema) && valid;
+	} else if(schema.items) {
+		valid = itemSchema(context, subject, schema);
+	}
+	return valid;
+}
+
+function itemSchema(context, subject, schema) {
 	var items = schema.items;
 
 	if(typeof items !== 'object')
@@ -10,7 +21,7 @@ function items(subject, schema, context) {
 	var lastPath = context.path.length;
 	for(var i = 0, len = subject.length; i < len; i++) {
 		context.path[lastPath] = i;
-		if(!validateBase(subject[i], items, context)) {
+		if(!validateBase(context, subject[i], items)) {
 			context.addError('Failed "items" criteria', subject, items);
 			return false;
 		}
@@ -20,12 +31,12 @@ function items(subject, schema, context) {
 	return true;
 }
 
-function tupleItems(subject, schema, context) {
+function tupleItems(context, subject, schema) {
 	var items = schema.items,
 		lastPath = context.path.length;
 	for(var i = 0, len = items.length; i < len; i++) {
 		context.path[lastPath] = i;
-		if(!validateBase(subject[i], items[i], context)) {
+		if(!validateBase(context, subject[i], items[i])) {
 			context.addError('Failed "items" criteria', subject, items);
 			return false;
 		}
@@ -35,7 +46,7 @@ function tupleItems(subject, schema, context) {
 	return true;
 }
 
-function additionalItems(subject, schema, context) {
+function additionalItems(context, subject, schema) {
 	var i = schema.items.length,
 		len = subject.length,
 		additionalItems = schema.additionalItems;
@@ -53,7 +64,7 @@ function additionalItems(subject, schema, context) {
 	var lastPath = context.path.length;
 	for(; i < len; i++) {
 		context.path[lastPath] = i;
-		if(!validateBase(subject[i], additionalItems, context)) {
+		if(!validateBase(context, subject[i], additionalItems)) {
 			context.addError('Failed "additionalItems" criteria', subject, schema);
 			return false;
 		}
@@ -63,7 +74,7 @@ function additionalItems(subject, schema, context) {
 	return true;
 }
 
-function minItems(subject, schema, context) {
+function minItems(context, subject, schema) {
 	if(subject.length < schema.minItems) {
 		context.addError('Failed "minItems" criteria', subject, schema);
 		return false;
@@ -72,7 +83,7 @@ function minItems(subject, schema, context) {
 	return true;
 }
 
-function maxItems(subject, schema, context) {
+function maxItems(context, subject, schema) {
 	if(subject.length > schema.maxItems) {
 		context.addError('Failed "maxItems" criteria', subject, schema);
 		return false;
@@ -81,7 +92,7 @@ function maxItems(subject, schema, context) {
 	return true;
 }
 
-function uniqueItems(subject, schema, context) {
+function uniqueItems(context, subject, schema) {
 	var i = subject.length, j;
 
 	while(i--) {
@@ -98,24 +109,16 @@ function uniqueItems(subject, schema, context) {
 }
 
 
-module.exports = function(subject, schema, context) {
+module.exports = function(context, subject, schema) {
 	if(!Array.isArray(subject)) {
 		context.addError('Failed type:array criteria', schema);
 		return false;
 	}
 
-	var valid = true;
-
-	if('minItems' in schema) valid = minItems(subject, schema, context) && valid;
-	if('maxItems' in schema) valid = maxItems(subject, schema, context) && valid;
-	if('uniqueItems' in schema) valid = uniqueItems(subject, schema, context) && valid;
-
-	if(Array.isArray(schema.items)) {
-		valid = tupleItems(subject, schema, context) && valid;
-		if('additionalItems' in schema) valid = additionalItems(subject, schema, context) && valid;
-	} else if(schema.items) {
-		valid = items(subject, schema, context) && valid;
-	}
-
-	return valid;
+	return context.runValidations([
+		[ 'minItems' in schema, minItems ],
+		[ 'maxItems' in schema, maxItems ],
+		[ 'uniqueItems' in schema, uniqueItems ],
+		[ 'items' in schema, items ]
+	], subject, schema);
 };

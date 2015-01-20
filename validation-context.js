@@ -14,18 +14,36 @@ var protoContext = {
 	},
 	subcontext: function(schema) {
 		return makeContext(schema, this);
+	},
+	runValidations: function(validations, subject, schema) {
+		var breakOnError = this.breakOnError,
+			args = Array.prototype.slice.call(arguments),
+			valid = true,
+			validation;
+
+		args[0] = this;
+
+		for(var i = 0, len = validations.length; i < len; i++) {
+			validation = validations[i];
+			if(!validation[0]) continue;
+			valid = validation[1].apply(null, args) && valid;
+			if(breakOnError && !valid) return false;
+		}
+
+		return valid;
 	}
 };
 
 var makeContext = module.exports = function(schema, context) {
 	context = context || {};
 	return Object.create(protoContext, {
-		instance: { enumerable:true, writable:false, value:context.instance || null },
+		instance: { enumerable:true, writable:false, value: context.instance || null },
 		id: { enumerable:true, writable:false, value: [] },
 		schema: { enumerable:true, writable:false, value: schema || context.schema },
 		path: { enumerable:true, writable:false, value: context.path && context.path.slice() || ['#'] },
 		result: { enumerable:true, writable:false, value: context.result || validationResult(context.instance) },
 		refs: { enumerable:true, writable:false, value: context.refs || jsonRefs() },
-		silent: { enumerable:true, writable:true, value:false }
+		silent: { enumerable:true, writable:true, value: false },
+		breakOnError: { enumerable:true, writable:true, value: context.breakOnError || false }
 	});
 };

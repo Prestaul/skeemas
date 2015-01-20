@@ -1,4 +1,4 @@
-function validateNumber(subject, schema, context) {
+function validateNumber(context, subject, schema) {
 	if(typeof subject !== 'number') {
 		context.addError('Failed type:number criteria', subject, schema);
 		return false;
@@ -7,7 +7,7 @@ function validateNumber(subject, schema, context) {
 	return true;
 }
 
-function validateInteger(subject, schema, context) {
+function validateInteger(context, subject, schema) {
 	if(typeof subject !== 'number' || subject !== Math.round(subject)) {
 		context.addError('Failed type:integer criteria', subject, schema);
 		return false;
@@ -16,7 +16,7 @@ function validateInteger(subject, schema, context) {
 	return true;
 }
 
-function minimum(subject, schema, context) {
+function minimum(context, subject, schema) {
 	var valid = (schema.exclusiveMinimum)
 		? subject > schema.minimum
 		: subject >= schema.minimum;
@@ -26,7 +26,7 @@ function minimum(subject, schema, context) {
 	return valid;
 }
 
-function maximum(subject, schema, context) {
+function maximum(context, subject, schema) {
 	var valid = (schema.exclusiveMaximum)
 		? subject < schema.maximum
 		: subject <= schema.maximum;
@@ -36,7 +36,9 @@ function maximum(subject, schema, context) {
 	return valid;
 }
 
-function multipleOf(subject, schema, context, key) {
+function multipleOf(context, subject, schema, key) {
+	key = key || 'multipleOf';
+
 	var valid = !(subject / schema[key] % 1);
 
 	if(!valid) context.addError('Failed "' + key + '" criteria', subject, schema);
@@ -44,18 +46,23 @@ function multipleOf(subject, schema, context, key) {
 	return valid;
 }
 
+function divisibleBy(context, subject, schema) {
+	return multipleOf(context, subject, schema, 'divisibleBy');
+}
 
 
-module.exports = function(subject, schema, context) {
+
+module.exports = function(context, subject, schema) {
 	var valid = true,
 		isType = true;
 
-	if(schema.type === 'number') isType = validateNumber(subject, schema, context);
-	if(schema.type === 'integer') isType = validateInteger(subject, schema, context);
-	if(isType && 'minimum' in schema) valid = minimum(subject, schema, context) && valid;
-	if(isType && 'maximum' in schema) valid = maximum(subject, schema, context) && valid;
-	if(isType && 'multipleOf' in schema) valid = multipleOf(subject, schema, context, 'multipleOf') && valid;
-	if(isType && 'divisibleBy' in schema) valid = multipleOf(subject, schema, context, 'divisibleBy') && valid;
+	if(schema.type === 'number') isType = validateNumber(context, subject, schema);
+	if(schema.type === 'integer') isType = validateInteger(context, subject, schema);
 
-	return isType && valid;
+	return isType && context.runValidations([
+		[ 'minimum' in schema, minimum ],
+		[ 'maximum' in schema, maximum ],
+		[ 'multipleOf' in schema, multipleOf ],
+		[ 'divisibleBy' in schema, divisibleBy ]
+	], subject, schema);
 };

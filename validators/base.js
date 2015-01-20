@@ -1,7 +1,22 @@
 var validators = require('./');
 
+function getType(subject) {
+	var type = typeof subject;
 
-function allOf(subject, schemas, context) {
+	if(type === 'object') {
+		if(subject === null) return 'null';
+		if(Array.isArray(subject)) return 'array';
+	}
+
+	if(type === 'number' && subject === Math.round(subject)) return 'integer';
+
+	return type;
+}
+
+
+function allOf(subject, schema, context) {
+	var schemas = schema.allOf;
+
 	if(!Array.isArray(schemas))
 		throw new Error('Invalid schema: "allOf" value must be an array');
 
@@ -19,7 +34,9 @@ function allOf(subject, schemas, context) {
 	return false;
 }
 
-function anyOf(subject, schemas, context) {
+function anyOf(subject, schema, context) {
+	var schemas = schema.anyOf;
+
 	if(!Array.isArray(schemas))
 		throw new Error('Invalid schema: "anyOf" value must be an array');
 
@@ -37,7 +54,9 @@ function anyOf(subject, schemas, context) {
 	return false;
 }
 
-function oneOf(subject, schemas, context) {
+function oneOf(subject, schema, context) {
+	var schemas = schema.oneOf;
+
 	if(!Array.isArray(schemas))
 		throw new Error('Invalid schema: "oneOf" value must be an array');
 
@@ -56,9 +75,10 @@ function oneOf(subject, schemas, context) {
 }
 
 function not(subject, schema, context) {
-	var valid = context.silently(function() {
-		return !validateBase(subject, schema, context);
-	});
+	var badSchema = schema.not,
+		valid = context.silently(function() {
+			return !validateBase(subject, badSchema, context);
+		});
 
 	if(valid) return true;
 
@@ -66,7 +86,7 @@ function not(subject, schema, context) {
 	return false;
 }
 
-function disallow(type, subject, schema, context) {
+function disallow(subject, schema, context, type) {
 	var invalidTypes = Array.isArray(schema.disallow) ? schema.disallow : [ schema.disallow ],
 		valid = !invalidTypes.some(function(invalidType) {
 			if(invalidType === 'any') return true;
@@ -106,7 +126,9 @@ function validateExtends(subject, schema, context) {
 	return invalidCount === 0;
 }
 
-function validateEnum(subject, values, context) {
+function validateEnum(subject, schema, context) {
+	var values = schema['enum'];
+
 	if(!Array.isArray(values))
 		throw new Error('Invalid schema: "enum" value must be an array');
 
@@ -119,7 +141,7 @@ function validateEnum(subject, values, context) {
 	return false;
 }
 
-function validateType(type, subject, schema, context) {
+function validateType(subject, schema, context, type) {
 	var validTypes = Array.isArray(schema.type) ? schema.type : [ schema.type ],
 		valid = validTypes.some(function(validType) {
 			if(validType === 'any') return true;
@@ -145,21 +167,8 @@ function validateType(type, subject, schema, context) {
 	return valid;
 }
 
-function typeValidations(type, subject, schema, context) {
+function typeValidations(subject, schema, context, type) {
 	return validators.types[type](subject, schema, context);
-}
-
-function getType(subject) {
-	var type = typeof subject;
-
-	if(type === 'object') {
-		if(subject === null) return 'null';
-		if(Array.isArray(subject)) return 'array';
-	}
-
-	if(type === 'number' && subject === Math.round(subject)) return 'integer';
-
-	return type;
 }
 
 function $ref(subject, schema, context) {
@@ -187,15 +196,15 @@ function validateBase(subject, schema, context) {
 
 	var valid = true,
 		type = getType(subject);
-	if(schema.type) valid = validateType(type, subject, schema, context) && valid;
-	if(schema.disallow) valid = disallow(type, subject, schema, context) && valid;
-	if(schema['enum']) valid = validateEnum(subject, schema['enum'], context) && valid;
-	valid = typeValidations(type, subject, schema, context) && valid;
-	if(schema['extends']) valid = validateExtends(subject, schema, context) && valid;
-	if(schema.allOf) valid = allOf(subject, schema.allOf, context) && valid;
-	if(schema.anyOf) valid = anyOf(subject, schema.anyOf, context) && valid;
-	if(schema.oneOf) valid = oneOf(subject, schema.oneOf, context) && valid;
-	if(schema.not) valid = not(subject, schema.not, context) && valid;
+	if('type' in schema) valid = validateType(subject, schema, context, type) && valid;
+	if('disallow' in schema) valid = disallow(subject, schema, context, type) && valid;
+	if('enum' in schema) valid = validateEnum(subject, schema, context) && valid;
+	valid = typeValidations(subject, schema, context, type) && valid;
+	if('extends' in schema) valid = validateExtends(subject, schema, context) && valid;
+	if('allOf' in schema) valid = allOf(subject, schema, context) && valid;
+	if('anyOf' in schema) valid = anyOf(subject, schema, context) && valid;
+	if('oneOf' in schema) valid = oneOf(subject, schema, context) && valid;
+	if('not' in schema) valid = not(subject, schema, context) && valid;
 
 	if(schema.id) {
 		context.id.pop();

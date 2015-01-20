@@ -1,7 +1,9 @@
 var validateBase = require('./base'),
 	deepEqual = require('./deep-equal');
 
-function items(subject, items, context) {
+function items(subject, schema, context) {
+	var items = schema.items;
+
 	if(typeof items !== 'object')
 		throw new Error('Invalid schema: invalid "items"');
 
@@ -18,8 +20,9 @@ function items(subject, items, context) {
 	return true;
 }
 
-function tupleItems(subject, items, context) {
-	var lastPath = context.path.length;
+function tupleItems(subject, schema, context) {
+	var items = schema.items,
+		lastPath = context.path.length;
 	for(var i = 0, len = items.length; i < len; i++) {
 		context.path[lastPath] = i;
 		if(!validateBase(subject[i], items[i], context)) {
@@ -105,13 +108,13 @@ module.exports = function(subject, schema, context) {
 
 	if('minItems' in schema) valid = minItems(subject, schema, context) && valid;
 	if('maxItems' in schema) valid = maxItems(subject, schema, context) && valid;
-	if(schema.uniqueItems) valid = uniqueItems(subject, schema, context) && valid;
+	if('uniqueItems' in schema) valid = uniqueItems(subject, schema, context) && valid;
 
 	if(Array.isArray(schema.items)) {
-		valid = tupleItems(subject, schema.items, context) && valid;
+		valid = tupleItems(subject, schema, context) && valid;
 		if('additionalItems' in schema) valid = additionalItems(subject, schema, context) && valid;
 	} else if(schema.items) {
-		valid = items(subject, schema.items, context) && valid;
+		valid = items(subject, schema, context) && valid;
 	}
 
 	return valid;

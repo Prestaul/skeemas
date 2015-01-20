@@ -32,72 +32,75 @@ npm test
 
 ## Feature Status
 
-- Ignored properties
-    - $schema
-    - id
-    - title
-    - description
-    - default
-- References
-    - [X] definitions
-    - [X] $ref
-- Criteria
-    - any type
-        - [X] allOf
-        - [X] anyOf
-        - [X] oneOf
-        - [X] not
-        - [X] enum
-        - [X] required
-        - [X] disallow
-        - [X] extends
-    - [X] array
-        - [X] items
-        - [X] additionalItems
-        - [X] minItems
-        - [X] maxItems
-        - [X] uniqueItems
-    - [X] boolean
-    - [X] null
-    - number, integer
-        - [X] multipleOf
-        - [X] divisibleBy
-        - [X] minimum
-        - [X] maximum
-        - [X] exclusiveMinimum
-        - [X] exclusiveMaximum
-    - [X] object
-        - [X] properties
-        - [X] patternProperties
-        - [X] additionalProperties
-        - [X] required
-        - [X] dependencies
-        - [X] minProperties
-        - [X] maxProperties
-        - dependencies
-    - [X] string
-        - [X] minLength
-        - [X] maxLength
-        - [X] pattern
-        - [X] format
-            - v4
-                - [X] date-time
-                - [X] email
-                - [X] hostname
-                - [X] ipv4
-                - [X] ipv6
-                - [X] uri
-            - v3
+- [X] Full Validation (all errors)
+- [ ] Quick Validation (first error)
+- [ ] Manual reference additions
+- [ ] Missing reference resolution
+- [ ] Custom format validation
+- [ ] Custom attribute validation
+- [X] JSON-Schema draft 03 and 04 feature support
+    - Ignored schema attributes
+        - $schema
+        - title
+        - description
+        - default
+    - [X] References
+        - [X] id
+        - [X] definitions
+        - [X] $ref
+    - [X] Validations by type
+        - [X] any
+            - [X] type
+            - [X] enum
+            - [X] extends
+            - [X] allOf
+            - [X] anyOf
+            - [X] oneOf
+            - [X] not
+            - [X] disallow
+            - [X] required
+            - [ ] format
+        - [X] array
+            - [X] items
+            - [X] additionalItems
+            - [X] minItems
+            - [X] maxItems
+            - [X] uniqueItems
+        - [X] boolean
+        - [X] null
+        - [X] number, integer
+            - [X] multipleOf
+            - [X] divisibleBy
+            - [X] minimum
+            - [X] maximum
+            - [X] exclusiveMinimum
+            - [X] exclusiveMaximum
+        - [X] object
+            - [X] properties
+            - [X] patternProperties
+            - [X] additionalProperties
+            - [X] required
+            - [X] dependencies
+            - [X] minProperties
+            - [X] maxProperties
+            - dependencies
+        - [X] string
+            - [X] minLength
+            - [X] maxLength
+            - [X] pattern
+            - [X] format
                 - [X] date-time
                 - [X] date
                 - [X] time
                 - [X] utc-millisec
+                - [X] email
+                - [X] hostname
+                - [X] host-name
+                - [X] ip-address
+                - [X] ipv4
+                - [X] ipv6
+                - [X] uri
                 - [X] regex
                 - [X] color
                 - [X] style
                 - [X] phone
-                - [X] uri
-                - [X] email
-                - [X] ip-address
-                - [X] ipv6
-                - [X] host-name

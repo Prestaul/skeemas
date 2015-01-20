@@ -3,7 +3,7 @@ var glob = require('glob');
 /**
  * Load up the tests from the JSON Schema Test Suite (https://github.com/json-schema/JSON-Schema-Test-Suite)
  */
-describe.only('JSON Schema Test Suite -', function() {
+describe('JSON Schema Test Suite -', function() {
 	function addTests(description, files) {
 		describe(description, function() {
 			files.forEach(function(file) {

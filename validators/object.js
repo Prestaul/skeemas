@@ -1,7 +1,8 @@
 var validateBase = require('./base');
 
-function properties(handledKeys, subject, props, context) {
-	var valid = true;
+function properties(subject, schema, context, handledKeys) {
+	var props = schema.properties,
+		valid = true;
 	for(var key in props) {
 		if(key in subject) {
 			handledKeys.push(key);
@@ -17,7 +18,7 @@ function properties(handledKeys, subject, props, context) {
 	return valid;
 }
 
-function patternProperties(handledKeys, subject, schema, context) {
+function patternProperties(subject, schema, context, handledKeys) {
 	var patternProps = schema.patternProperties;
 
 	if(typeof patternProps !== 'object')
@@ -47,7 +48,7 @@ function patternProperties(handledKeys, subject, schema, context) {
 	return valid;
 }
 
-function additionalProperties(handledKeys, subject, schema, context) {
+function additionalProperties(subject, schema, context, handledKeys) {
 	var additionalProps = schema.additionalProperties;
 
 	if(additionalProps === true) return true;
@@ -97,7 +98,9 @@ function maxProperties(subject, schema, context) {
 	return true;
 }
 
-function required(subject, requiredProps, context) {
+function required(subject, schema, context) {
+	var requiredProps = schema.required;
+
 	if(!Array.isArray(requiredProps))
 		throw new Error('Invalid schema: "required" must be an array');
 
@@ -113,7 +116,9 @@ function required(subject, requiredProps, context) {
 	return valid;
 }
 
-function dependencies(subject, deps, context) {
+function dependencies(subject, schema, context) {
+	var deps = schema.dependencies;
+
 	if(typeof deps !== 'object')
 		throw new Error('Invalid schema: "dependencies" must be an object');
 
@@ -158,13 +163,13 @@ function validateObject(subject, schema, context) {
 
 	var handledKeys = [];
 
-	if(schema.properties) valid = properties(handledKeys, subject, schema.properties, context) && valid;
-	if(schema.patternProperties) valid = patternProperties(handledKeys, subject, schema, context) && valid;
-	if('additionalProperties' in schema) valid = additionalProperties(handledKeys, subject, schema, context) && valid;
+	if('properties' in schema) valid = properties(subject, schema, context, handledKeys) && valid;
+	if('patternProperties' in schema) valid = patternProperties(subject, schema, context, handledKeys) && valid;
+	if('additionalProperties' in schema) valid = additionalProperties(subject, schema, context, handledKeys) && valid;
 	if('minProperties' in schema) valid = minProperties(subject, schema, context) && valid;
 	if('maxProperties' in schema) valid = maxProperties(subject, schema, context) && valid;
-	if(schema.required) valid = required(subject, schema.required, context) && valid;
-	if(schema.dependencies) valid = dependencies(subject, schema.dependencies, context) && valid;
+	if('required' in schema) valid = required(subject, schema, context) && valid;
+	if('dependencies' in schema) valid = dependencies(subject, schema, context) && valid;
 
 	return valid;
 }

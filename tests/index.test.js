@@ -76,4 +76,166 @@ describe('Validate', function() {
 			assert.lengthOf(result.errors, 1);
 		});
 	});
+
+	describe('result.cleanInstance', function() {
+		it('should leave null untouched', function() {
+			var result = validate(null, { type:'null' });
+			assert.strictEqual(result.cleanInstance, null);
+		});
+
+		it('should leave true untouched', function() {
+			var result = validate(true, { type:'boolean' });
+			assert.strictEqual(result.cleanInstance, true);
+		});
+
+		it('should leave false untouched', function() {
+			var result = validate(false, { type:'boolean' });
+			assert.strictEqual(result.cleanInstance, false);
+		});
+
+		it('should leave an integer untouched', function() {
+			var result = validate(1337, { type:'integer' });
+			assert.strictEqual(result.cleanInstance, 1337);
+		});
+
+		it('should leave a number untouched', function() {
+			var result = validate(42.1337, { type:'number' });
+			assert.strictEqual(result.cleanInstance, 42.1337);
+		});
+
+		it('should leave a string untouched', function() {
+			var result = validate('test', { type:'string' });
+			assert.strictEqual(result.cleanInstance, 'test');
+		});
+
+		it('should clone an array', function() {
+			var subject = [1, 2, 3],
+				result = validate(subject, { type:'array' });
+			assert.deepEqual(result.cleanInstance, subject);
+			assert.notStrictEqual(result.cleanInstance, subject);
+		});
+
+		describe('an object', function() {
+			it('should leave defined properties', function() {
+				var result = validate({
+					foo: 'bar',
+					foobar: 42,
+					foobat: [1, 'test'],
+					foobaz: 'far',
+					boo: 'far',
+					boofar: 'bad'
+				}, {
+					properties: {
+						foo: {},
+						boo: {}
+					}
+				});
+
+				assert.deepEqual(result.cleanInstance, {
+					foo: 'bar',
+					boo: 'far'
+				});
+			});
+
+			it('should leave pattern properties', function() {
+				var result = validate({
+					foo: 'bar',
+					foobar: 42,
+					foobat: [1, 'test'],
+					foobaz: 'far',
+					boo: 'far',
+					boofar: 'bad'
+				}, {
+					properties: {
+						boo: {}
+					},
+					patternProperties: {
+						'^foo': {}
+					}
+				});
+
+				assert.deepEqual(result.cleanInstance, {
+					foo: 'bar',
+					foobar: 42,
+					foobat: [1, 'test'],
+					foobaz: 'far',
+					boo: 'far'
+				});
+			});
+
+			it('should remove undefined additional properties', function() {
+				var result = validate({
+					foo: 'bar',
+					foobar: 42,
+					boo: 'far'
+				}, {
+					properties: {
+						foo: {}
+					},
+					additionalProperties: true
+				});
+
+				assert.deepEqual(result.cleanInstance, {
+					foo: 'bar'
+				});
+			});
+
+			it('should leave defined additional properties', function() {
+				var result = validate({
+					foo: 'bar',
+					foobar: 42,
+					boo: 'far'
+				}, {
+					properties: {
+						foo: {}
+					},
+					additionalProperties: { type:'any' }
+				});
+
+				assert.deepEqual(result.cleanInstance, {
+					foo: 'bar',
+					foobar: 42,
+					boo: 'far'
+				});
+			});
+
+			it('should leave defined nested properties', function() {
+				var result = validate({
+					foo: 'bar',
+					boo: 'far',
+					nested: {
+						foo: 'nestbar',
+						boo: 'nestfar',
+						arr: [{
+							foo:'arrfoo',
+							boo:'nestbar'
+						}]
+					}
+				}, {
+					definitions: {
+						foo: {
+							properties: {
+								foo: {},
+								arr: {
+									items: { $ref:'#/definitions/foo' }
+								},
+								nested: { $ref:'#/definitions/foo' }
+							}
+						}
+					},
+					$ref:'#/definitions/foo'
+				});
+
+				assert.deepEqual(result.cleanInstance, {
+					foo: 'bar',
+					nested: {
+						foo: 'nestbar',
+						arr: [{
+							foo:'arrfoo'
+						}]
+					}
+				});
+			});
+		});
+	});
 });

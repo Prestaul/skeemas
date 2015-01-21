@@ -8,7 +8,7 @@ function properties(context, subject, schema, handledProps) {
 			context.path.push(key);
 			valid = validateBase(context, subject[key], props[key]) && valid;
 			context.path.pop();
-			handledProps[key] = subject[key];
+			handledProps[key] = context.cleanSubject;
 		} else if(props[key].required) {
 			context.addError('Failed "required" criteria: missing property (' + key + ')', subject, props);
 			valid = false;
@@ -40,7 +40,7 @@ function patternProperties(context, subject, schema, handledProps) {
 				context.path.push(key);
 				valid = validateBase(context, subject[key], patternProps[patterns[j]]) && valid;
 				context.path.pop();
-				if(!(key in handledProps)) handledProps[key] = subject[key];
+				if(!(key in handledProps)) handledProps[key] = context.cleanSubject;
 			}
 		}
 	}
@@ -75,6 +75,7 @@ function additionalProperties(context, subject, schema, handledProps) {
 		context.path.push(keys[i]);
 		valid = validateBase(context, subject[keys[i]], additionalProps) && valid;
 		context.path.pop();
+		handledProps[keys[i]] = context.cleanSubject;
 	}
 
 	return valid;
@@ -161,17 +162,20 @@ function validateObject(context, subject, schema) {
 		valid = false;
 	}
 
-	var handledProps = {};
+	var handledProps = {},
+		valid = context.runValidations([
+			[ 'properties' in schema, properties ],
+			[ 'patternProperties' in schema, patternProperties ],
+			[ 'additionalProperties' in schema, additionalProperties ],
+			[ 'minProperties' in schema, minProperties ],
+			[ 'maxProperties' in schema, maxProperties ],
+			[ 'required' in schema, required ],
+			[ 'dependencies' in schema, dependencies ]
+		], subject, schema, handledProps);
 
-	return context.runValidations([
-		[ 'properties' in schema, properties ],
-		[ 'patternProperties' in schema, patternProperties ],
-		[ 'additionalProperties' in schema, additionalProperties ],
-		[ 'minProperties' in schema, minProperties ],
-		[ 'maxProperties' in schema, maxProperties ],
-		[ 'required' in schema, required ],
-		[ 'dependencies' in schema, dependencies ]
-	], subject, schema, handledProps);
+	context.cleanSubject = handledProps;
+
+	return valid;
 }
 
 module.exports = validateObject;

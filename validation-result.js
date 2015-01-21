@@ -14,6 +14,7 @@ var protoValidationResult = {
 module.exports = function(instance) {
 	return Object.create(protoValidationResult, {
 		instance: { enumerable:true, writable:false, value:instance },
+		cleanInstance: { enumerable:true, writable:true, value: undefined },
 		valid: { enumerable:true, writable:true, value:true },
 		errors: { enumerable:true, writable:false, value:[] }
 	});

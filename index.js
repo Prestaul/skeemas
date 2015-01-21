@@ -9,6 +9,7 @@ module.exports = function() {
 		validate: function(instance, schema, breakOnError) {
 			var context = validationContext(schema, { instance:instance, refs:refs, breakOnError:breakOnError });
 			validators.base(context, instance, schema);
+			if(context.result.valid) context.result.cleanInstance = context.cleanSubject;
 			return context.result;
 		}
 	};
@@ -17,5 +18,6 @@ module.exports = function() {
 module.exports.validate = function(instance, schema, breakOnError) {
 	var context = validationContext(schema, { instance:instance, breakOnError:breakOnError });
 	validators.base(context, instance, schema);
+	if(context.result.valid) context.result.cleanInstance = context.cleanSubject;
 	return context.result;
 };

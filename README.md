@@ -34,7 +34,7 @@ npm test
 
 - [X] Full Validation (all errors)
 - [X] Quick Validation (first error)
-- [ ] Instance cleaning
+- [X] Instance cleaning
 - [X] Manual reference additions
 - [ ] Missing reference resolution
 - [ ] Custom format validation

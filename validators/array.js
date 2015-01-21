@@ -1,18 +1,20 @@
 var validateBase = require('./base'),
 	deepEqual = require('./deep-equal');
 
-function items(context, subject, schema) {
+function items(context, subject, schema, cleanItems) {
 	var valid = true;
+
 	if(Array.isArray(schema.items)) {
-		valid = tupleItems(context, subject, schema);
-		if('additionalItems' in schema) valid = additionalItems(context, subject, schema) && valid;
+		valid = tupleItems(context, subject, schema, cleanItems);
+		if('additionalItems' in schema) valid = additionalItems(context, subject, schema, cleanItems) && valid;
 	} else if(schema.items) {
-		valid = itemSchema(context, subject, schema);
+		valid = itemSchema(context, subject, schema, cleanItems);
 	}
+
 	return valid;
 }
 
-function itemSchema(context, subject, schema) {
+function itemSchema(context, subject, schema, cleanItems) {
 	var items = schema.items;
 
 	if(typeof items !== 'object')
@@ -25,13 +27,14 @@ function itemSchema(context, subject, schema) {
 			context.addError('Failed "items" criteria', subject, items);
 			return false;
 		}
+		cleanItems.push(context.cleanSubject);
 	}
 	context.length = lastPath;
 
 	return true;
 }
 
-function tupleItems(context, subject, schema) {
+function tupleItems(context, subject, schema, cleanItems) {
 	var items = schema.items,
 		lastPath = context.path.length;
 	for(var i = 0, len = items.length; i < len; i++) {
@@ -40,13 +43,14 @@ function tupleItems(context, subject, schema) {
 			context.addError('Failed "items" criteria', subject, items);
 			return false;
 		}
+		cleanItems.push(context.cleanSubject);
 	}
 	context.length = lastPath;
 
 	return true;
 }
 
-function additionalItems(context, subject, schema) {
+function additionalItems(context, subject, schema, cleanItems) {
 	var i = schema.items.length,
 		len = subject.length,
 		additionalItems = schema.additionalItems;
@@ -68,6 +72,7 @@ function additionalItems(context, subject, schema) {
 			context.addError('Failed "additionalItems" criteria', subject, schema);
 			return false;
 		}
+		cleanItems.push(context.cleanSubject);
 	}
 	context.length = lastPath;
 
@@ -115,10 +120,18 @@ module.exports = function(context, subject, schema) {
 		return false;
 	}
 
-	return context.runValidations([
-		[ 'minItems' in schema, minItems ],
-		[ 'maxItems' in schema, maxItems ],
-		[ 'uniqueItems' in schema, uniqueItems ],
-		[ 'items' in schema, items ]
-	], subject, schema);
+	var cleanItems = [],
+		valid = context.runValidations([
+			[ 'minItems' in schema, minItems ],
+			[ 'maxItems' in schema, maxItems ],
+			[ 'uniqueItems' in schema, uniqueItems ],
+			[ 'items' in schema, items ]
+		], subject, schema, cleanItems);
+
+	if('items' in schema)
+		context.cleanSubject = cleanItems;
+	else
+		context.cleanSubject = subject.slice();
+
+	return valid;
 };

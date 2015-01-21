@@ -38,6 +38,8 @@ function validateString(context, subject, schema) {
 		return false;
 	}
 
+	context.cleanSubject = subject;
+
 	return context.runValidations([
 		[ 'minLength' in schema, minLength ],
 		[ 'maxLength' in schema, maxLength ],

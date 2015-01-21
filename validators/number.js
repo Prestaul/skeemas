@@ -59,6 +59,8 @@ module.exports = function(context, subject, schema) {
 	if(schema.type === 'number') isType = validateNumber(context, subject, schema);
 	if(schema.type === 'integer') isType = validateInteger(context, subject, schema);
 
+	context.cleanSubject = subject;
+
 	return isType && context.runValidations([
 		[ 'minimum' in schema, minimum ],
 		[ 'maximum' in schema, maximum ],

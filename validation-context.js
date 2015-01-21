@@ -43,6 +43,7 @@ var makeContext = module.exports = function(schema, context) {
 		result: { enumerable:true, writable:false, value: context.result || validationResult(context.instance) },
 		refs: { enumerable:true, writable:false, value: context.refs || jsonRefs() },
 		silent: { enumerable:true, writable:true, value: false },
-		breakOnError: { enumerable:true, writable:true, value: context.breakOnError || false }
+		breakOnError: { enumerable:true, writable:true, value: context.breakOnError || false },
+		cleanSubject: { enumerable:true, writable:true, value: undefined }
 	});
 };

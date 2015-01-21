@@ -3,6 +3,9 @@ function validateNull(context, subject, schema) {
 		context.addError('Failed type:null criteria', subject, schema);
 		return false;
 	}
+
+	context.cleanSubject = subject;
+
 	return true;
 }
 

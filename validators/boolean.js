@@ -3,6 +3,9 @@ function validateBoolean(context, subject, schema) {
 		context.addError('Failed type:boolean criteria', subject, schema);
 		return false;
 	}
+
+	context.cleanSubject = subject;
+
 	return true;
 }
 

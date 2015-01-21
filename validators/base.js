@@ -15,13 +15,19 @@ function getType(subject) {
 
 
 function validateTypes(context, subject, type, validTypes) {
-	return validTypes.some(function(validType) {
+	var i = validTypes.length,
+		validType, valid;
+	while(i--) {
+		validType = validTypes[i];
+
 		if(validType === 'any') return true;
 
 		if(typeof validType === 'object') {
-			return context.silently(function() {
+			valid = context.silently(function() {
 				return validateBase(context, subject, validType);
 			});
+			if(valid) return true;
+			else continue;
 		}
 
 		if(!(validType in validators.types))
@@ -29,8 +35,10 @@ function validateTypes(context, subject, type, validTypes) {
 
 		if(validType === 'number' && type === 'integer') return true;
 
-		return type === validType;
-	});
+		if(type === validType) return true;
+	}
+
+	return false;
 }
 
 function allOf(context, subject, schema) {

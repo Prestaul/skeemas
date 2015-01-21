@@ -7,11 +7,12 @@ describe('JSON Schema Test Suite -', function() {
 	function addTests(description, files) {
 		describe(description, function() {
 			files.forEach(function(file) {
-				var skip = /zeroTerminatedFloats\.json$/.test(file);
+				// Skip "zeroTerminatedFloats" because in javascript 1 === 1.0
+				if(/zeroTerminatedFloats\.json$/.test(file)) return;
 
 				// Load the suite
 				require(file).forEach(function(suite) {
-					(skip ? describe.skip : describe)(suite.description, function() {
+					describe(suite.description, function() {
 						// Load the tests
 						suite.tests.forEach(function(test) {
 							// Create individual tests

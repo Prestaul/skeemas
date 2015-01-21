@@ -34,11 +34,11 @@ npm test
 
 - [X] Full Validation (all errors)
 - [X] Quick Validation (first error)
-- [ ] Manual reference additions
+- [X] Manual reference additions
 - [ ] Missing reference resolution
 - [ ] Custom format validation
 - [ ] Custom attribute validation
-- [ ] JSON-Schema draft 03 and 04 feature support
+- [X] JSON-Schema draft 03 and 04 feature support
     - Ignored schema attributes
         - $schema
         - title
@@ -48,8 +48,8 @@ npm test
         - [X] id
         - [X] definitions
         - [X] $ref
-    - [ ] Validations by type
-        - [ ] any
+    - [X] Validations by type
+        - [X] any
             - [X] type
             - [X] enum
             - [X] extends
@@ -59,7 +59,7 @@ npm test
             - [X] not
             - [X] disallow
             - [X] required
-            - [ ] format
+            - [X] format
         - [X] array
             - [X] items
             - [X] additionalItems

@@ -1,14 +1,14 @@
 var validateBase = require('./base');
 
-function properties(context, subject, schema, handledKeys) {
+function properties(context, subject, schema, handledProps) {
 	var props = schema.properties,
 		valid = true;
 	for(var key in props) {
 		if(key in subject) {
-			handledKeys.push(key);
 			context.path.push(key);
 			valid = validateBase(context, subject[key], props[key]) && valid;
 			context.path.pop();
+			handledProps[key] = subject[key];
 		} else if(props[key].required) {
 			context.addError('Failed "required" criteria: missing property (' + key + ')', subject, props);
 			valid = false;
@@ -18,7 +18,7 @@ function properties(context, subject, schema, handledKeys) {
 	return valid;
 }
 
-function patternProperties(context, subject, schema, handledKeys) {
+function patternProperties(context, subject, schema, handledProps) {
 	var patternProps = schema.patternProperties;
 
 	if(typeof patternProps !== 'object')
@@ -37,10 +37,10 @@ function patternProperties(context, subject, schema, handledKeys) {
 		j = len;
 		while(j--) {
 			if(key.match(patterns[j])) {
-				if(!~handledKeys.indexOf(key)) handledKeys.push(key);
 				context.path.push(key);
 				valid = validateBase(context, subject[key], patternProps[patterns[j]]) && valid;
 				context.path.pop();
+				if(!(key in handledProps)) handledProps[key] = subject[key];
 			}
 		}
 	}
@@ -48,7 +48,7 @@ function patternProperties(context, subject, schema, handledKeys) {
 	return valid;
 }
 
-function additionalProperties(context, subject, schema, handledKeys) {
+function additionalProperties(context, subject, schema, handledProps) {
 	var additionalProps = schema.additionalProperties;
 
 	if(additionalProps === true) return true;
@@ -57,7 +57,7 @@ function additionalProperties(context, subject, schema, handledKeys) {
 		i = keys.length;
 	if(additionalProps === false) {
 		while(i--) {
-			if(!~handledKeys.indexOf(keys[i])) {
+			if(!(keys[i] in handledProps)) {
 				context.addError('Failed "additionalProperties" criteria: unexpected property (' + keys[i] + ')', subject, schema);
 				return false;
 			}
@@ -70,7 +70,7 @@ function additionalProperties(context, subject, schema, handledKeys) {
 
 	var valid;
 	while(i--) {
-		if(~handledKeys.indexOf(keys[i])) continue;
+		if(keys[i] in handledProps) continue;
 
 		context.path.push(keys[i]);
 		valid = validateBase(context, subject[keys[i]], additionalProps) && valid;
@@ -161,7 +161,7 @@ function validateObject(context, subject, schema) {
 		valid = false;
 	}
 
-	var handledKeys = [];
+	var handledProps = {};
 
 	return context.runValidations([
 		[ 'properties' in schema, properties ],
@@ -171,7 +171,7 @@ function validateObject(context, subject, schema) {
 		[ 'maxProperties' in schema, maxProperties ],
 		[ 'required' in schema, required ],
 		[ 'dependencies' in schema, dependencies ]
-	], subject, schema, handledKeys);
+	], subject, schema, handledProps);
 }
 
 module.exports = validateObject;

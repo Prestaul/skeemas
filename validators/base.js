@@ -14,6 +14,25 @@ function getType(subject) {
 }
 
 
+function validateTypes(context, subject, type, validTypes) {
+	return validTypes.some(function(validType) {
+		if(validType === 'any') return true;
+
+		if(typeof validType === 'object') {
+			return context.silently(function() {
+				return validateBase(context, subject, validType);
+			});
+		}
+
+		if(!(validType in validators.types))
+			throw new Error('Invalid schema: invalid type (' + validType + ')');
+
+		if(validType === 'number' && type === 'integer') return true;
+
+		return type === validType;
+	});
+}
+
 function allOf(context, subject, schema) {
 	var schemas = schema.allOf;
 
@@ -88,22 +107,7 @@ function not(context, subject, schema) {
 
 function disallow(context, subject, schema, type) {
 	var invalidTypes = Array.isArray(schema.disallow) ? schema.disallow : [ schema.disallow ],
-		valid = !invalidTypes.some(function(invalidType) {
-			if(invalidType === 'any') return true;
-
-			if(typeof invalidType === 'object') {
-				return context.silently(function() {
-					return validateBase(context, subject, invalidType);
-				});
-			}
-
-			if(!(invalidType in validators.types))
-				throw new Error('Invalid schema: invalid type (' + invalidType + ')');
-
-			if(invalidType === 'number' && type === 'integer') return true;
-
-			return type === invalidType;
-		});
+		valid = !validateTypes(context, subject, type, invalidTypes);
 
 	if(!valid) {
 		context.addError('Failed "disallow" criteria: expecting ' + invalidTypes.join(' or ') + ', found ' + type, subject, schema);
@@ -143,22 +147,7 @@ function validateEnum(context, subject, schema) {
 
 function validateType(context, subject, schema, type) {
 	var validTypes = Array.isArray(schema.type) ? schema.type : [ schema.type ],
-		valid = validTypes.some(function(validType) {
-			if(validType === 'any') return true;
-
-			if(typeof validType === 'object') {
-				return context.silently(function() {
-					return validateBase(context, subject, validType);
-				});
-			}
-
-			if(!(validType in validators.types))
-				throw new Error('Invalid schema: invalid type (' + validType + ')');
-
-			if(validType === 'number' && type === 'integer') return true;
-
-			return type === validType;
-		});
+		valid = validateTypes(context, subject, type, validTypes);
 
 	if(!valid) {
 		context.addError('Failed "type" criteria: expecting ' + validTypes.join(' or ') + ', found ' + type, subject, schema);

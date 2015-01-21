@@ -1,4 +1,18 @@
+var jsonValidate = require('../');
+
 describe('Validate', function() {
+	it('should throw an error if missing schema', function() {
+		assert.throws(function() {
+			validate('test');
+		});
+	});
+
+	it('should throw an error if adding a reference schema without a uri/id', function() {
+		assert.throws(function() {
+			jsonValidate().addRef({});
+		});
+	});
+
 	describe('an empty schema', function() {
 		it('should validate an array', function() {
 			assert.isTrue(validate([], {}).valid);
@@ -235,6 +249,75 @@ describe('Validate', function() {
 						}]
 					}
 				});
+			});
+		});
+	});
+
+	describe('with reference schema', function() {
+		var localValidator = jsonValidate().addRef('/some/schema', {
+			properties: { foo: { type:'string' } }
+		});
+
+		it('should validate against a referenced schema', function() {
+			assert.isTrue(localValidator.validate({ foo:'test' }, '/some/schema').valid);
+		});
+
+		it('should invalidate against a referenced schema', function() {
+			assert.isFalse(localValidator.validate({ foo:42 }, '/some/schema').valid);
+		});
+
+		it('should validate against a referenced schema fragment', function() {
+			assert.isTrue(localValidator.validate('test', '/some/schema#/properties/foo').valid);
+		});
+
+		it('should invalidate against a referenced schema fragment', function() {
+			assert.isFalse(localValidator.validate(42, '/some/schema#/properties/foo').valid);
+		});
+
+		it('should throw an error for missing reference', function() {
+			assert.throws(function() {
+				localValidator.validate('test', '/some/missing/schema');
+			});
+		});
+
+		it('should throw an error for missing fragment reference', function() {
+			assert.throws(function() {
+				localValidator.validate('test', '/some/schema#/not/here');
+			});
+		});
+	});
+
+	describe('with reference schema added by id', function() {
+		var localValidator = jsonValidate().addRef({
+			id: '/some/schema',
+			properties: { foo: { type:'string' } }
+		});
+
+		it('should validate against a referenced schema', function() {
+			assert.isTrue(localValidator.validate({ foo:'test' }, '/some/schema').valid);
+		});
+
+		it('should invalidate against a referenced schema', function() {
+			assert.isFalse(localValidator.validate({ foo:42 }, '/some/schema').valid);
+		});
+
+		it('should validate against a referenced schema fragment', function() {
+			assert.isTrue(localValidator.validate('test', '/some/schema#/properties/foo').valid);
+		});
+
+		it('should invalidate against a referenced schema fragment', function() {
+			assert.isFalse(localValidator.validate(42, '/some/schema#/properties/foo').valid);
+		});
+
+		it('should throw an error for missing reference', function() {
+			assert.throws(function() {
+				localValidator.validate('test', '/some/missing/schema');
+			});
+		});
+
+		it('should throw an error for missing fragment reference', function() {
+			assert.throws(function() {
+				localValidator.validate('test', '/some/schema#/not/here');
 			});
 		});
 	});

@@ -36,7 +36,7 @@ npm test
 - [X] Quick Validation (first error)
 - [X] Instance cleaning
 - [X] Manual reference additions
-- [ ] Validate by reference
+- [X] Validate by reference
 - [ ] Missing reference resolution
 - [ ] Custom format validation
 - [ ] Custom attribute validation

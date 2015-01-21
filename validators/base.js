@@ -248,9 +248,7 @@ function validateBase(context, subject, schema) {
 		return $ref(context, subject, schema);
 	}
 
-	if(schema.id) {
-		context.id.push(schema.id);
-	}
+	if(schema.id) context.id.push(schema.id);
 
 	var valid = context.runValidations([
 		[ 'type' in schema, validateType ],
@@ -265,9 +263,7 @@ function validateBase(context, subject, schema) {
 		[ 'not' in schema, not ]
 	], subject, schema, getType(subject));
 
-	if(schema.id) {
-		context.id.pop();
-	}
+	if(schema.id) context.id.pop();
 
 	return valid;
 }

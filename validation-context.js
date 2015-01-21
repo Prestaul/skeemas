@@ -37,7 +37,6 @@ var protoContext = {
 var makeContext = module.exports = function(schema, context) {
 	context = context || {};
 	return Object.create(protoContext, {
-		instance: { enumerable:true, writable:false, value: context.instance || null },
 		id: { enumerable:true, writable:false, value: [] },
 		schema: { enumerable:true, writable:false, value: schema || context.schema },
 		path: { enumerable:true, writable:false, value: context.path && context.path.slice() || ['#'] },

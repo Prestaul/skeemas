@@ -25,5 +25,9 @@
     "glob": "^4.3.5",
     "jshint": "^2.6.0",
     "mocha": "^2.1.0"
+  },
+  "dependencies": {
+    "skeemas-json-pointer": "^1.0.0",
+    "skeemas-json-refs": "^1.0.0"
   }
 }

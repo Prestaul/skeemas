@@ -155,11 +155,9 @@ function dependencies(context, subject, schema) {
 
 
 function validateObject(context, subject, schema) {
-	var valid = true;
-
 	if(typeof subject !== 'object') {
 		context.addError('Failed type:object criteria', subject, schema);
-		valid = false;
+		return false;
 	}
 
 	var handledProps = {},

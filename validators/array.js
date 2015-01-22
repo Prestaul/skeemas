@@ -53,22 +53,22 @@ function tupleItems(context, subject, schema, cleanItems) {
 function additionalItems(context, subject, schema, cleanItems) {
 	var i = schema.items.length,
 		len = subject.length,
-		additionalItems = schema.additionalItems;
+		additionalItemSchema = schema.additionalItems;
 
-	if(additionalItems === false) {
+	if(additionalItemSchema === false) {
 		if(len <= i) return true;
 
 		context.addError('Failed "additionalItems" criteria: no additional items are allowed', subject, schema);
 		return false;
 	}
 
-	if(typeof additionalItems !== 'object')
+	if(typeof additionalItemSchema !== 'object')
 		throw new Error('Invalid schema: invalid "additionalItems"');
 
 	var lastPath = context.path.length;
 	for(; i < len; i++) {
 		context.path[lastPath] = i;
-		if(!validateBase(context, subject[i], additionalItems)) {
+		if(!validateBase(context, subject[i], additionalItemSchema)) {
 			context.addError('Failed "additionalItems" criteria', subject, schema);
 			return false;
 		}

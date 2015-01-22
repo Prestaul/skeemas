@@ -1,4 +1,5 @@
-var validateNumber = validators.types.number;
+var validateNumber = require('../../validators').types.number,
+	validationContext = require('../../validation-context');
 
 
 describe('Number validator', function() {

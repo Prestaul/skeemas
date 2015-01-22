@@ -11,7 +11,7 @@ function getType(subject) {
 function arrayEqual(a, b) {
 	var i = a.length;
 
-	if(i !== b.length) return false;;
+	if(i !== b.length) return false;
 
 	while(i--) {
 		if(!deepEqual(a[i], b[i])) return false;

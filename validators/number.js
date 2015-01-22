@@ -17,9 +17,7 @@ function validateInteger(context, subject, schema) {
 }
 
 function minimum(context, subject, schema) {
-	var valid = (schema.exclusiveMinimum)
-		? subject > schema.minimum
-		: subject >= schema.minimum;
+	var valid = (schema.exclusiveMinimum) ? subject > schema.minimum : subject >= schema.minimum;
 
 	if(!valid) context.addError('Failed "minimum" criteria', subject, schema);
 
@@ -27,9 +25,7 @@ function minimum(context, subject, schema) {
 }
 
 function maximum(context, subject, schema) {
-	var valid = (schema.exclusiveMaximum)
-		? subject < schema.maximum
-		: subject <= schema.maximum;
+	var valid = (schema.exclusiveMaximum) ? subject < schema.maximum : subject <= schema.maximum;
 
 	if(!valid) context.addError('Failed "maximum" criteria', subject, schema);
 
@@ -39,7 +35,7 @@ function maximum(context, subject, schema) {
 function multipleOf(context, subject, schema, key) {
 	key = key || 'multipleOf';
 
-	var valid = !(subject / schema[key] % 1);
+	var valid = (subject / schema[key] % 1) === 0;
 
 	if(!valid) context.addError('Failed "' + key + '" criteria', subject, schema);
 

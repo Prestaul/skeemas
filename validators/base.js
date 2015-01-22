@@ -44,15 +44,15 @@ function getType(subject) {
 }
 
 function format(context, subject, schema) {
-	var format = schema.format,
-		validator = formats[format];
+	var fmt = schema.format,
+		validator = formats[fmt];
 
 	if(!validator)
-		throw new Error('Invalid schema: unknown format (' + format + ')');
+		throw new Error('Invalid schema: unknown format (' + fmt + ')');
 
 	var valid = validator.test ? validator.test(subject) : validator(subject);
 	if(!valid) {
-		context.addError('Failed "format" criteria (' + format + ')', subject, schema);
+		context.addError('Failed "format" criteria (' + fmt + ')', subject, schema);
 	}
 
 	return valid;
@@ -69,7 +69,7 @@ function validateTypes(context, subject, type, validTypes) {
 		if(typeof validType === 'object') {
 			valid = context.silently(function() {
 				return validateBase(context, subject, validType);
-			});
+			}); // jshint ignore:line
 			if(valid) return true;
 			else continue;
 		}

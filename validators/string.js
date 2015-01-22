@@ -20,10 +20,10 @@ function maxLength(context, subject, schema) {
 }
 
 function pattern(context, subject, schema) {
-	var pattern = schema.pattern;
+	var strPattern = schema.pattern;
 
-	if(!subject.match(pattern)) {
-		context.addError('Failed "pattern" criteria (' + pattern + ')', subject, pattern);
+	if(!subject.match(strPattern)) {
+		context.addError('Failed "pattern" criteria (' + strPattern + ')', subject, strPattern);
 		return false;
 	}
 

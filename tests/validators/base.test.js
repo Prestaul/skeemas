@@ -1,4 +1,5 @@
-var validateBase = validators.base;
+var validateBase = require('../../validators').base,
+	validationContext = require('../../validation-context');
 
 
 describe('Base validator', function() {

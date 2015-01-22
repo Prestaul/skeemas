@@ -102,6 +102,7 @@ npm test
 - [ ] Missing reference resolution
 - [ ] Custom format validation
 - [ ] Custom attribute validation
+- [X] Plugins
 - [X] JSON-Schema draft 03 and 04 feature support
     - Ignored schema attributes
         - $schema

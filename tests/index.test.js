@@ -1,4 +1,4 @@
-var jsonValidate = require('../');
+var skeemas = require('../');
 
 describe('Validate', function() {
 	it('should throw an error if missing schema', function() {
@@ -9,7 +9,7 @@ describe('Validate', function() {
 
 	it('should throw an error if adding a reference schema without a uri/id', function() {
 		assert.throws(function() {
-			jsonValidate().addRef({});
+			skeemas().addRef({});
 		});
 	});
 
@@ -254,7 +254,7 @@ describe('Validate', function() {
 	});
 
 	describe('with reference schema', function() {
-		var localValidator = jsonValidate().addRef('/some/schema', {
+		var localValidator = skeemas().addRef('/some/schema', {
 			properties: { foo: { type:'string' } }
 		});
 
@@ -288,7 +288,7 @@ describe('Validate', function() {
 	});
 
 	describe('with reference schema added by id', function() {
-		var localValidator = jsonValidate().addRef({
+		var localValidator = skeemas().addRef({
 			id: '/some/schema',
 			properties: { foo: { type:'string' } }
 		});

@@ -7,5 +7,5 @@ validator
 	.addRef('http://localhost:1234/subSchemas.json', require('./json-schema-test-suite/remotes/subSchemas.json'))
 	.addRef('http://localhost:1234/folder/folderInteger.json', require('./json-schema-test-suite/remotes/folder/folderInteger.json'));
 
-global.validate = validator.validate;
+global.validate = validator.validate.bind(validator);
 global.assert = require('chai').assert;

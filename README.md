@@ -15,6 +15,36 @@ var skeemas = require('skeemas');
 skeemas.validate('foo', { type:'string' }).valid; // true
 skeemas.validate(10000, { type:'string' }).valid; // false
 skeemas.validate(10000, { type:'number' }).valid; // true
+
+var result = skeemas.validate({
+    foo: 'bar',
+    nested: {
+        stuff: [1,2,3],
+        ignoreMe: 'undeclared property'
+    }
+}, {
+    properties: {
+        foo: { type:'string' },
+        nested: {
+            properties: {
+                stuff: {
+                    type: 'array',
+                    items: { type:'integer' }
+                }
+                // We aren't going to declare `ignoreMe`. To disallow extra 
+                // props we could set `additionalProperties:false`.
+            }
+        }
+    }
+}); 
+result.valid; // true
+assert.deepEqual(result.cleanInstance, {
+    foo: 'bar',
+    nested: {
+        stuff: [1,2,3]
+        // notice the `ignoreMe` property is removed from `cleanInstance`
+    }
+});
 ```
 
 For more information about constructing schemas see http://json-schema.org/ or the wonderful guide at http://spacetelescope.github.io/understanding-json-schema/index.html
@@ -24,14 +54,16 @@ For more information about constructing schemas see http://json-schema.org/ or t
 Skeemas supports validation by schema id and refrences between schemas via the `$ref` property:
 
 ```js
+// Create an instance of a validator
 var validator = require('skeemas')();
 
+// Add schemas to the validator
 validator.addRef({ type:'string', pattern:'^[a-z0-9]+$' }, '/identifier');
 
-// Validate by id
+// Validate by uri/id
 validator.validate('foo123', '/identifier').valid; // true
 
-// Use a $ref reference
+// Use a $ref reference in other schemas
 validator.validate(user, { 
     type: 'object',
     properties: {

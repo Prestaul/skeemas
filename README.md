@@ -1,19 +1,49 @@
-# skeemas-validate
-Lightweight JSON Schema valiation
+# skeemas
+Lightweight JSON Schema validation
 
 
 ## Installation
 ```bash
-npm install skeemas-validate
+npm install skeemas --save
 ```
 
 
-## Usage
-@TODO
+## Basic Validation
+```js
+var skeemas = require('skeemas');
+
+skeemas.validate('foo', { type:'string' }).valid; // true
+skeemas.validate(10000, { type:'string' }).valid; // false
+skeemas.validate(10000, { type:'number' }).valid; // true
+```
+
+For more information about constructing schemas see http://json-schema.org/ or the wonderful guide at http://spacetelescope.github.io/understanding-json-schema/index.html
+
+
+## Adding Schemas
+Skeemas supports validation by schema id and refrences between schemas via the `$ref` property:
+
+```js
+var validator = require('skeemas')();
+
+validator.addRef({ type:'string', pattern:'^[a-z0-9]+$' }, '/identifier');
+
+// Validate by id
+validator.validate('foo123', '/identifier').valid; // true
+
+// Use a $ref reference
+validator.validate(user, { 
+    type: 'object',
+    properties: {
+        id: { '$ref':'/identifier' },
+        name: { type:'string' }
+    } 
+}).valid; // true
+```
 
 
 ## Development
-Our tests are running JSON Schema test suite at [https://github.com/json-schema/JSON-Schema-Test-Suite](https://github.com/json-schema/JSON-Schema-Test-Suite). Those tests are referenced as a submodule and therefore dev setup is a little non-standard.
+Our tests are running the JSON Schema test suite at [https://github.com/json-schema/JSON-Schema-Test-Suite](https://github.com/json-schema/JSON-Schema-Test-Suite). Those tests are referenced as a submodule and therefore dev setup is a little non-standard.
 ```bash
 # clone the repo
 

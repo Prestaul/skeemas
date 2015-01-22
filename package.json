@@ -1,10 +1,11 @@
 {
-  "name": "skeemas-validate",
+  "name": "skeemas",
   "version": "1.0.0",
   "description": "Lightweight JSON Schema valiation",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -R dot --require tests/bootstrap.js tests/{**/,}/*.test.js"
+    "test": "mocha -R dot --require tests/bootstrap.js tests/{**/,}/*.test.js",
+    "lint": "jshint ."
   },
   "keywords": [
     "json-schema",
@@ -14,7 +15,11 @@
     "schema"
   ],
   "author": "Matt Dunlap <mpdunlap@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Prestaul/skeemas.git"
+  },
   "devDependencies": {
     "chai": "^1.10.0",
     "glob": "^4.3.5",

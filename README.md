@@ -115,7 +115,7 @@ npm test
             - [X] dependencies
             - [X] minProperties
             - [X] maxProperties
-            - dependencies
+            - [X] dependencies
         - [X] string
             - [X] minLength
             - [X] maxLength

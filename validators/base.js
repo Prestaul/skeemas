@@ -215,13 +215,18 @@ function typeValidations(context, subject, schema, type) {
 function $ref(context, subject, schema) {
 	var absolute = /^#|\//.test(schema.$ref),
 		ref = absolute ? schema.$ref : context.id.join('') + schema.$ref,
-		refSchema = context.refs.get(ref, context.schema);
+		refSchema = context.refs.get(ref, context.schema),
+		ctx = context;
 
 	if(schema.$ref[0] !== '#') {
-		context = context.subcontext(context.refs.get(ref, context.schema, true));
+		ctx = context.subcontext(context.refs.get(ref, context.schema, true));
 	}
 
-	return validateBase(context, subject, refSchema);
+	var valid = validateBase(ctx, subject, refSchema);
+
+	context.cleanSubject = ctx.cleanSubject;
+
+	return valid;
 }
 
 

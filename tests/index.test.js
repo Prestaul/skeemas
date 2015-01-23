@@ -250,6 +250,24 @@ describe('Validate', function() {
 					}
 				});
 			});
+
+			it('should clean instance properly even with reference properties', function() {
+				var localValidator = skeemas().addRef('/ref', {}),
+					result = localValidator.validate({
+						foo: 'bar',
+						boo: 'far'
+					}, {
+						properties: {
+							foo: { '$ref':'/ref' },
+							boo: {}
+						}
+					});
+
+				assert.deepEqual(result.cleanInstance, {
+					foo: 'bar',
+					boo: 'far'
+				});
+			});
 		});
 	});
 

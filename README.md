@@ -74,6 +74,11 @@ validator.validate(user, {
 ```
 
 
+## Related Modules
+
+- [skeemas-body-parser](https://github.com/Prestaul/skeemas-body-parser) - json body parser with schema validation
+
+
 ## Development
 Our tests are running the JSON Schema test suite at [https://github.com/json-schema/JSON-Schema-Test-Suite](https://github.com/json-schema/JSON-Schema-Test-Suite). Those tests are referenced as a submodule and therefore dev setup is a little non-standard.
 ```bash

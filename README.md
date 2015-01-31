@@ -1,5 +1,5 @@
 # skeemas
-Lightweight JSON Schema validation
+Comprehensive JSON Schema (drafts 3 and 4) validation.
 
 
 ## Installation
@@ -9,12 +9,24 @@ npm install skeemas --save
 
 
 ## Basic Validation
+**`skeemas.validate(subject, schema[, breakOnError])`**
+
 ```js
 var skeemas = require('skeemas');
 
 skeemas.validate('foo', { type:'string' }).valid; // true
 skeemas.validate(10000, { type:'string' }).valid; // false
 skeemas.validate(10000, { type:'number' }).valid; // true
+
+// Result contains an array of errors
+var result = skeemas.validate('test', { enum:['foobar'], minLength:5 });
+result.valid; // false
+result.errors; // array with 2 error objects
+
+// Pass true for third argument to stop processing on the first error
+var result = skeemas.validate('test', { enum:['foobar'], minLength:5 }, true);
+result.valid; // false
+result.errors; // array with 1 error object
 
 var result = skeemas.validate({
     foo: 'bar',

@@ -231,23 +231,6 @@ function $ref(context, subject, schema) {
 
 
 
-function runValidations(validations, context, subject, schema) {
-	var breakOnError = context.breakOnError,
-		args = Array.prototype.slice.call(arguments, 1),
-		valid = true,
-		validation;
-
-	for(var i = 0, len = validations.length; i < len; i++) {
-		validation = validations[i];
-		if(!validation[0]) continue;
-		valid = validation[1].apply(null, args) && valid;
-		if(breakOnError && !valid) return false;
-	}
-
-	return valid;
-}
-
-
 function validateBase(context, subject, schema) {
 	if(schema.$ref) {
 		return $ref(context, subject, schema);

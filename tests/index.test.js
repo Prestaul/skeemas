@@ -268,6 +268,62 @@ describe('Validate', function() {
 					boo: 'far'
 				});
 			});
+
+			describe('with cleanWithDefaults', function() {
+				it('should add defaults', function() {
+					var result = validate({}, {
+						properties: {
+							foo: { default:'bar' },
+							boo: { default:'far' }
+						}
+					}, { cleanWithDefaults:true });
+
+					assert.deepEqual(result.cleanInstance, {
+						foo: 'bar',
+						boo: 'far'
+					});
+				});
+
+				it('should not override values with defaults', function() {
+					var result = validate({
+						foo: 'bat'
+					}, {
+						properties: {
+							foo: { default:'bar' },
+							boo: { default:'far' }
+						}
+					}, { cleanWithDefaults:true });
+
+					assert.deepEqual(result.cleanInstance, {
+						foo: 'bat',
+						boo: 'far'
+					});
+				});
+
+				it('should add complex default', function() {
+					var result = validate({}, {
+						properties: {
+							foo: { default: { bar:'bat' } }
+						}
+					}, { cleanWithDefaults:true });
+
+					assert.deepEqual(result.cleanInstance, {
+						foo: { bar:'bat' }
+					});
+				});
+
+				it('should add null default', function() {
+					var result = validate({}, {
+						properties: {
+							foo: { default: null }
+						}
+					}, { cleanWithDefaults:true });
+
+					assert.deepEqual(result.cleanInstance, {
+						foo: null
+					});
+				});
+			});
 		});
 	});
 

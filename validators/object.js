@@ -153,6 +153,18 @@ function dependencies(context, subject, schema) {
 	return valid;
 }
 
+function addDefaults(subject, schema) {
+	var props = schema.properties;
+
+	if(!props) return;
+
+	for(var key in props) {
+		if('default' in props[key] && !(key in subject)) {
+			subject[key] = props[key].default;
+		}
+	}
+}
+
 
 function validateObject(context, subject, schema) {
 	if(typeof subject !== 'object') {
@@ -170,6 +182,8 @@ function validateObject(context, subject, schema) {
 			[ Array.isArray(schema.required), required ],
 			[ 'dependencies' in schema, dependencies ]
 		], subject, schema, handledProps);
+
+	if(context.cleanWithDefaults) addDefaults(handledProps, schema);
 
 	context.cleanSubject = handledProps;
 

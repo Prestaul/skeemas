@@ -30,7 +30,8 @@ var protoValidator = {
 		var context = validationContext(schema, {
 			instance: instance,
 			refs: this._refs,
-			breakOnError: options && options.breakOnError
+			breakOnError: options && options.breakOnError,
+			cleanWithDefaults: options && options.cleanWithDefaults
 		});
 		validators.base(context, instance, schema);
 		if(context.result.valid) context.result.cleanInstance = context.cleanSubject;
@@ -52,7 +53,8 @@ module.exports.validate = function(instance, schema, options) {
 
 	var context = validationContext(schema, {
 		instance: instance,
-		breakOnError: options && options.breakOnError
+		breakOnError: options && options.breakOnError,
+		cleanWithDefaults: options && options.cleanWithDefaults
 	});
 	validators.base(context, instance, schema);
 	if(context.result.valid) context.result.cleanInstance = context.cleanSubject;

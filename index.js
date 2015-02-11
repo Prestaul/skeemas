@@ -16,7 +16,7 @@ var protoValidator = {
 
 		return this;
 	},
-	validate: function(instance, schema, breakOnError) {
+	validate: function(instance, schema, options) {
 		if(instance === undefined) throw new Error('Instance undefined in call to validate.');
 		if(!schema) throw new Error('No schema specified in call to validate.');
 
@@ -27,7 +27,11 @@ var protoValidator = {
 			if(!schema) throw new Error('Unable to locate schema (' + uri + '). Did you call addRef with this schema?');
 		}
 
-		var context = validationContext(schema, { instance:instance, refs:this._refs, breakOnError:breakOnError });
+		var context = validationContext(schema, {
+			instance: instance,
+			refs: this._refs,
+			breakOnError: options && options.breakOnError
+		});
 		validators.base(context, instance, schema);
 		if(context.result.valid) context.result.cleanInstance = context.cleanSubject;
 		return context.result;
@@ -42,11 +46,14 @@ function makeValidator() {
 
 module.exports = makeValidator;
 
-module.exports.validate = function(instance, schema, breakOnError) {
+module.exports.validate = function(instance, schema, options) {
 	if(instance === undefined) throw new Error('Instance undefined in call to validate.');
 	if(!schema) throw new Error('No schema specified in call to validate.');
 
-	var context = validationContext(schema, { instance:instance, breakOnError:breakOnError });
+	var context = validationContext(schema, {
+		instance: instance,
+		breakOnError: options && options.breakOnError
+	});
 	validators.base(context, instance, schema);
 	if(context.result.valid) context.result.cleanInstance = context.cleanSubject;
 	return context.result;

@@ -9,7 +9,7 @@ npm install skeemas --save
 
 
 ## Basic Validation
-**`skeemas.validate(subject, schema[, breakOnError])`**
+**`skeemas.validate(subject, schema[, options])`**
 
 ```js
 var skeemas = require('skeemas');
@@ -23,8 +23,8 @@ var result = skeemas.validate('test', { enum:['foobar'], minLength:5 });
 result.valid; // false
 result.errors; // array with 2 error objects
 
-// Pass true for third argument to stop processing on the first error
-var result = skeemas.validate('test', { enum:['foobar'], minLength:5 }, true);
+// Pass the "breakOnError" option to stop processing on the first error
+var result = skeemas.validate('test', { enum:['foobar'], minLength:5 }, { breakOnError:true });
 result.valid; // false
 result.errors; // array with 1 error object
 

@@ -85,7 +85,7 @@ describe('Validate', function() {
 		});
 
 		it('should have single error if breakOnError', function() {
-			var result = validate('test', { enum:['foobar'], minLength:5 }, true);
+			var result = validate('test', { enum:['foobar'], minLength:5 }, { breakOnError:true });
 			assert.isArray(result.errors);
 			assert.lengthOf(result.errors, 1);
 		});

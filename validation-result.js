@@ -1,10 +1,15 @@
+function errorToString() {
+	return this.message + ' (pointer: ' + this.context + ')';
+}
+
 var protoValidationResult = {
 	addError: function(message, subject, criteria, context) {
 		this.errors.push({
 			message: message,
 			context: context.path.join('/'),
 			value: subject,
-			criteria: criteria
+			criteria: criteria,
+			toString: errorToString
 		});
 		this.valid = false;
 		return this;

@@ -9,7 +9,7 @@ function properties(context, subject, schema, handledProps) {
 			valid = validateBase(context, subject[key], props[key]) && valid;
 			context.path.pop();
 			handledProps[key] = context.cleanSubject;
-		} else if(props[key].required) {
+		} else if(props[key].required === true) {
 			context.addError('Failed "required" criteria: missing property (' + key + ')', subject, props);
 			valid = false;
 		}
@@ -167,7 +167,7 @@ function validateObject(context, subject, schema) {
 			[ 'additionalProperties' in schema, additionalProperties ],
 			[ 'minProperties' in schema, minProperties ],
 			[ 'maxProperties' in schema, maxProperties ],
-			[ 'required' in schema, required ],
+			[ Array.isArray(schema.required), required ],
 			[ 'dependencies' in schema, dependencies ]
 		], subject, schema, handledProps);
 

@@ -339,4 +339,29 @@ describe('Validate', function() {
 			});
 		});
 	});
+
+	it('should handle required:true in props', function() {
+		var schema = {
+			properties: {
+				foo: {
+					required: true
+				}
+			}
+		};
+		assert.isTrue(validate({ foo: { bar:1 } }, schema).valid);
+		assert.isFalse(validate({ boo: { bar:1 } }, schema).valid);
+	});
+
+	it('should handle required:[] in props', function() {
+		var schema = {
+			properties: {
+				foo: {
+					required: ['bar']
+				}
+			}
+		};
+		assert.isTrue(validate({ foo: { bar:1 } }, schema).valid);
+		assert.isFalse(validate({ foo: { far:1 } }, schema).valid);
+		assert.isTrue(validate({ boo: { far:1 } }, schema).valid);
+	});
 });

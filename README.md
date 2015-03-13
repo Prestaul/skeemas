@@ -88,7 +88,8 @@ validator.validate(user, {
 
 ## Related Modules
 
-- [skeemas-body-parser](https://github.com/Prestaul/skeemas-body-parser) - json body parser with schema validation
+- [skeemas-body-parser](https://github.com/Prestaul/skeemas-body-parser) - json body parser middleware with schema validation
+- [skeemas-markdown-validation](https://github.com/Prestaul/skeemas-markdown-validation) - simple testing of json blocks in your markdown documentation
 
 
 ## Development

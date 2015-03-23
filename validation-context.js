@@ -13,7 +13,7 @@ var protoContext = {
 		return result;
 	},
 	subcontext: function(schema) {
-		return makeContext(schema, this);
+		return makeContext(schema, this, this.silent);
 	},
 	runValidations: function(validations, subject, schema) {
 		var breakOnError = this.breakOnError,
@@ -34,13 +34,13 @@ var protoContext = {
 	}
 };
 
-var makeContext = module.exports = function(schema, context) {
+var makeContext = module.exports = function(schema, context, forceNewResult) {
 	context = context || {};
 	return Object.create(protoContext, {
 		id: { enumerable:true, writable:false, value: [] },
 		schema: { enumerable:true, writable:false, value: schema || context.schema },
 		path: { enumerable:true, writable:false, value: context.path && context.path.slice() || ['#'] },
-		result: { enumerable:true, writable:false, value: context.result || validationResult(context.instance) },
+		result: { enumerable:true, writable:false, value: (!forceNewResult && context.result) || validationResult(context.instance) },
 		refs: { enumerable:true, writable:false, value: context.refs || jsonRefs() },
 		silent: { enumerable:true, writable:true, value: false },
 		breakOnError: { enumerable:true, writable:true, value: context.breakOnError || false },

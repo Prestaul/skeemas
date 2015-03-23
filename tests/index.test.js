@@ -396,6 +396,84 @@ describe('Validate', function() {
 		});
 	});
 
+	describe('schema having anyOf with references', function() {
+		var localValidator = skeemas().addRef('/foo/schema', {
+				enum: [ 'foo' ]
+			}),
+			schema = {
+				definitions: {
+					bars: {
+						enum: [ 'bar' ]
+					},
+					ints: {
+						type: 'integer'
+					}
+				},
+				anyOf: [
+					{ $ref: '#/definitions/ints' },
+					{ $ref: '/foo/schema' },
+					{ $ref: '#/definitions/bars' }
+				]
+			};
+
+		it('should validate correctly', function() {
+			assert.isTrue(localValidator.validate(42, schema).valid, 'should validate an int');
+			assert.isTrue(localValidator.validate('foo', schema).valid, 'should validate "foo"');
+			assert.isTrue(localValidator.validate('bar', schema).valid, 'should validate "bar"');
+		});
+
+		it('should invalidate correctly', function() {
+			var result = localValidator.validate(42.1337, schema);
+			assert.isFalse(result.valid, 'float should be invalid');
+			assert.lengthOf(result.errors, 1, 'should have one error');
+			assert.match(result.errors[0].message, /anyOf/, 'should be an "anyOf" error');
+
+			result = localValidator.validate('boo', schema);
+			assert.isFalse(result.valid, '"boo" should be invalid');
+			assert.lengthOf(result.errors, 1, 'should have one error');
+			assert.match(result.errors[0].message, /anyOf/, 'should be an "anyOf" error');
+		});
+	});
+
+	describe('schema having oneOf with references', function() {
+		var localValidator = skeemas().addRef('/foo/schema', {
+				enum: [ 'foo' ]
+			}),
+			schema = {
+				definitions: {
+					bars: {
+						enum: [ 'bar' ]
+					},
+					ints: {
+						type: 'integer'
+					}
+				},
+				oneOf: [
+					{ $ref: '#/definitions/ints' },
+					{ $ref: '/foo/schema' },
+					{ $ref: '#/definitions/bars' }
+				]
+			};
+
+		it('should validate correctly', function() {
+			assert.isTrue(localValidator.validate(42, schema).valid, 'should validate an int');
+			assert.isTrue(localValidator.validate('foo', schema).valid, 'should validate "foo"');
+			assert.isTrue(localValidator.validate('bar', schema).valid, 'should validate "bar"');
+		});
+
+		it('should invalidate correctly', function() {
+			var result = localValidator.validate(42.1337, schema);
+			assert.isFalse(result.valid, 'float should be invalid');
+			assert.lengthOf(result.errors, 1, 'should have one error');
+			assert.match(result.errors[0].message, /oneOf/, 'should be an "oneOf" error');
+
+			result = localValidator.validate('boo', schema);
+			assert.isFalse(result.valid, '"boo" should be invalid');
+			assert.lengthOf(result.errors, 1, 'should have one error');
+			assert.match(result.errors[0].message, /oneOf/, 'should be an "oneOf" error');
+		});
+	});
+
 	it('should handle required:true in props', function() {
 		var schema = {
 			properties: {

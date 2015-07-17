@@ -53,27 +53,37 @@ describe('Base validator', function() {
 			var ctx = validationContext({});
 			assert.isTrue(validateBase(ctx, '', ctx.schema));
 		});
+	});
 
-		describe('format', function() {
-			it('should validate integer string utc-millisec', function() {
-				var ctx = validationContext({ format:'utc-millisec' });
-				assert.isTrue(validateBase(ctx, '1337', ctx.schema));
-			});
+	describe('format', function() {
+		it('should validate integer string utc-millisec', function() {
+			var ctx = validationContext({ format:'utc-millisec' });
+			assert.isTrue(validateBase(ctx, '1337', ctx.schema));
+		});
 
-			it('should invalidate float string utc-millisec', function() {
-				var ctx = validationContext({ format:'utc-millisec' });
-				assert.isFalse(validateBase(ctx, '1337.42', ctx.schema));
-			});
+		it('should invalidate float string utc-millisec', function() {
+			var ctx = validationContext({ format:'utc-millisec' });
+			assert.isFalse(validateBase(ctx, '1337.42', ctx.schema));
+		});
 
-			it('should validate integer number utc-millisec', function() {
-				var ctx = validationContext({ format:'utc-millisec' });
-				assert.isTrue(validateBase(ctx, 1337, ctx.schema));
-			});
+		it('should validate integer number utc-millisec', function() {
+			var ctx = validationContext({ format:'utc-millisec' });
+			assert.isTrue(validateBase(ctx, 1337, ctx.schema));
+		});
 
-			it('should invalidate float number utc-millisec', function() {
-				var ctx = validationContext({ format:'utc-millisec' });
-				assert.isFalse(validateBase(ctx, 1337.42, ctx.schema));
-			});
+		it('should invalidate float number utc-millisec', function() {
+			var ctx = validationContext({ format:'utc-millisec' });
+			assert.isFalse(validateBase(ctx, 1337.42, ctx.schema));
+		});
+
+		it('should validate an email string', function() {
+			var ctx = validationContext({ format:'email' });
+			assert.isTrue(validateBase(ctx, 'foo@bar.com', ctx.schema));
+		});
+
+		it('should validate an uncommon email string', function() {
+			var ctx = validationContext({ format:'email' });
+			assert.isTrue(validateBase(ctx, 'foo.bar+junk@boo.far.museum', ctx.schema));
 		});
 	});
 

@@ -498,4 +498,27 @@ describe('Validate', function() {
 		assert.isFalse(validate({ foo: { far:1 } }, schema).valid);
 		assert.isTrue(validate({ boo: { far:1 } }, schema).valid);
 	});
+
+	describe('errors', function() {
+		describe('after arrays of objects', function() {
+			it('should have correct context', function() {
+				var result = validate({
+					"someArray": [ 'stuff' ]
+				}, {
+					properties: {
+						someArray: {
+							items: {}
+						},
+						missingProp: {
+							required: true
+						}
+					}
+				});
+
+				assert.isFalse(result.valid);
+				assert.lengthOf(result.errors, 1);
+				assert.strictEqual(result.errors[0].context, '#');
+			});
+		});
+	});
 });

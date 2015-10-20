@@ -29,7 +29,7 @@ function itemSchema(context, subject, schema, cleanItems) {
 		}
 		cleanItems.push(context.cleanSubject);
 	}
-	context.length = lastPath;
+	context.path.length = lastPath;
 
 	return true;
 }
@@ -45,7 +45,7 @@ function tupleItems(context, subject, schema, cleanItems) {
 		}
 		cleanItems.push(context.cleanSubject);
 	}
-	context.length = lastPath;
+	context.path.length = lastPath;
 
 	return true;
 }
@@ -74,7 +74,7 @@ function additionalItems(context, subject, schema, cleanItems) {
 		}
 		cleanItems.push(context.cleanSubject);
 	}
-	context.length = lastPath;
+	context.path.length = lastPath;
 
 	return true;
 }

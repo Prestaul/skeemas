@@ -503,11 +503,16 @@ describe('Validate', function() {
 		describe('after arrays of objects', function() {
 			it('should have correct context', function() {
 				var result = validate({
-					"someArray": [ 'stuff' ]
+					"someArray": [ {} ]
 				}, {
 					properties: {
 						someArray: {
-							items: {}
+							items: {
+								type: "object",
+								properties: {
+									foo: { required: true }
+								}
+							}
 						},
 						missingProp: {
 							required: true
@@ -516,8 +521,8 @@ describe('Validate', function() {
 				});
 
 				assert.isFalse(result.valid);
-				assert.lengthOf(result.errors, 1);
-				assert.strictEqual(result.errors[0].context, '#');
+				assert.lengthOf(result.errors, 3);
+				assert.strictEqual(result.errors[2].context, '#');
 			});
 		});
 	});

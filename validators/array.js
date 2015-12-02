@@ -25,6 +25,7 @@ function itemSchema(context, subject, schema, cleanItems) {
 		context.path[lastPath] = i;
 		if(!validateBase(context, subject[i], items)) {
 			context.addError('Failed "items" criteria', subject, items);
+			context.path.length = lastPath;
 			return false;
 		}
 		cleanItems.push(context.cleanSubject);
@@ -41,6 +42,7 @@ function tupleItems(context, subject, schema, cleanItems) {
 		context.path[lastPath] = i;
 		if(!validateBase(context, subject[i], items[i])) {
 			context.addError('Failed "items" criteria', subject, items);
+			context.path.length = lastPath;
 			return false;
 		}
 		cleanItems.push(context.cleanSubject);
@@ -70,6 +72,7 @@ function additionalItems(context, subject, schema, cleanItems) {
 		context.path[lastPath] = i;
 		if(!validateBase(context, subject[i], additionalItemSchema)) {
 			context.addError('Failed "additionalItems" criteria', subject, schema);
+			context.path.length = lastPath;
 			return false;
 		}
 		cleanItems.push(context.cleanSubject);

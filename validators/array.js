@@ -38,7 +38,7 @@ function itemSchema(context, subject, schema, cleanItems) {
 function tupleItems(context, subject, schema, cleanItems) {
 	var items = schema.items,
 		lastPath = context.path.length;
-	for(var i = 0, len = items.length; i < len; i++) {
+	for(var i = 0, len = items.length, lenSubject = subject.length; i < len && i < lenSubject; i++) {
 		context.path[lastPath] = i;
 		if(!validateBase(context, subject[i], items[i])) {
 			context.addError('Failed "items" criteria', subject, items);

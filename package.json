@@ -1,6 +1,6 @@
 {
   "name": "skeemas",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Lightweight JSON Schema valiation",
   "main": "index.js",
   "scripts": {

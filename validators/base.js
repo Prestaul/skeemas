@@ -218,9 +218,17 @@ function typeValidations(context, subject, schema, type) {
 	return validators.types[type](context, subject, schema);
 }
 
+function pathFromIds(ids) {
+	return ids.map(function(id) {
+		var lastSlash = id.lastIndexOf("/");
+		if(lastSlash === -1) return id;
+		return id.substr(0, lastSlash + 1);
+	}).join('');
+}
+
 function $ref(context, subject, schema) {
-	var absolute = /^#|\//.test(schema.$ref),
-		ref = absolute ? schema.$ref : context.id.join('') + schema.$ref,
+	var absolute = /^(#|\/)/.test(schema.$ref),
+		ref = absolute ? schema.$ref : pathFromIds(context.id) + schema.$ref,
 		refSchema = context.refs.get(ref, context.schema),
 		ctx = context;
 

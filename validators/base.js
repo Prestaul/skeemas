@@ -1,3 +1,4 @@
+var INVALID_ESCAPES = /[^\\]\\[^.*+?^${}()|[\]\\bBcdDfnrsStvwWxu0-9]/;
 var validators = require('./'),
 	formats = {
 		'date-time': /^\d{4}-(0[0-9]{1}|1[0-2]{1})-[0-9]{2}[t ]\d{2}:\d{2}:\d{2}(\.\d+)?([zZ]|[+-]\d{2}:\d{2})$/i,
@@ -19,9 +20,14 @@ var validators = require('./'),
 			return !isNaN(parsed) && parsed.toString() === subject.toString();
 		},
 		'regex': function (subject) {
-			try { new RegExp(subject); }
-			catch(e) { return false; }
-			return true;
+			if(INVALID_ESCAPES.test(subject)) return false;
+			try {
+				new RegExp(subject);
+				return true;
+			}
+			catch(e) {
+				return false;
+			}
 		}
 	};
 

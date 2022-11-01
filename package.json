@@ -22,9 +22,9 @@
   },
   "devDependencies": {
     "chai": "^1.10.0",
-    "glob": "^4.3.5",
+    "glob": "^8.0.3",
     "jshint": "^2.6.0",
-    "mocha": "^2.1.0"
+    "mocha": "^10.1.0"
   },
   "dependencies": {
     "skeemas-json-pointer": "^1.0.0",
